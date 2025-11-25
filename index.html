@@ -64,13 +64,13 @@
             display: none; justify-content: center; align-items: center; flex-direction: column;
         }
 
-        /* Submit Button Styling - Enhanced */
+        /* Submit Button Styling - Enhanced (Now Blue/Indigo) */
         .submit-btn {
-            /* More vibrant gradient, larger shadow, and click animation */
-            @apply w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-extrabold py-4 /* Increased padding for better touch */
-                   rounded-xl shadow-2xl hover:from-green-600 hover:to-blue-700 /* Enhanced Hover */
+            /* Blue gradient, larger shadow, and click animation */
+            @apply w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-extrabold py-4 /* Increased padding for better touch */
+                   rounded-xl shadow-2xl hover:from-blue-700 hover:to-indigo-800 /* Enhanced Hover */
                    transition duration-300 ease-in-out transform active:scale-[0.98] /* Click effect */
-                   focus:outline-none focus:ring-4 focus:ring-cyan-300; /* New focus color */
+                   focus:outline-none focus:ring-4 focus:ring-indigo-400; /* New focus color */
         }
         
         /* Footer Bar */
@@ -151,7 +151,7 @@
         <!-- 4. รายละเอียด (Detail) - MOVED HERE -->
         <div>
             <label for="detail" class="section-label">4. รายละเอียดเพิ่มเติม</label>
-            <textarea id="detail" rows="4" class="input-field resize-none" placeholder="เช่น บริเวณหน้าปากซอย 3/2 มีน้ำรั่วซึมขนาดใหญ่ หรือแจ้งเบอร์เสาไฟที่ใกล้ที่สุด..."></textarea>
+            <textarea id="detail" rows="4" class="input-field resize-none" placeholder="รายละเอียด..."></textarea>
         </div>
         
         <!-- 5. ผู้แจ้ง (Name) -->
@@ -368,7 +368,7 @@
             showCancelButton: true,
             confirmButtonText: '<i class="fa-solid fa-check-circle mr-1"></i> ยืนยัน ส่งข้อมูล',
             cancelButtonText: '<i class="fa-solid fa-times-circle mr-1"></i> ยกเลิก',
-            confirmButtonColor: '#10B981', // Green confirm
+            confirmButtonColor: '#4f46e5', // Indigo confirm
             cancelButtonColor: '#6B7280', // Gray cancel
         });
 
@@ -405,7 +405,7 @@
                     title: 'ส่งข้อมูลสำเร็จ!',
                     text: 'การแจ้งเหตุของคุณถูกส่งถึงเจ้าหน้าที่เรียบร้อยแล้ว และจะได้รับการดำเนินการต่อไป',
                     confirmButtonText: 'ปิดหน้าจอ',
-                    confirmButtonColor: '#10B981'
+                    confirmButtonColor: '#4f46e5' // Changed to Indigo for consistency
                 });
 
                 // 5. Close LIFF window or refresh
