@@ -133,8 +133,11 @@
 
         <!-- 1. หัวข้อ (Topic) -->
         <div>
+            <!-- Label and Select are now separated by the block structure -->
             <label for="topic" class="section-label">1. หัวข้อการแจ้ง <span class="text-red-500">*</span></label>
-            <select id="topic" class="input-field appearance-none bg-white">
+            <!-- เพิ่ม class "w-full" ตรงนี้เพื่อให้เต็ม 100% -->
+            <div class="w-full"> 
+            <select id="topic" class="input-field appearance-none bg-white mt-1 border-2 border-blue-200 w-full rounded-lg">
                 <option value="" disabled selected>--- เลือกหัวข้อปัญหา ---</option>
                 <option value="ท่อแตกรั่ว">ท่อแตกรั่ว</option>
                 <option value="น้ำไม่ไหล/ไหลอ่อน">น้ำไม่ไหล/ไหลอ่อน</option>
@@ -142,6 +145,7 @@
                 <option value="มิเตอร์หาย/ชำรุด">มิเตอร์หาย/ชำรุด</option>
                 <option value="อื่นๆ">อื่นๆ (ระบุในรายละเอียด)</option>
             </select>
+            </div>
         </div>
 
          <!-- 2. รายละเอียด (Detail) - USING NEW STYLING -->
