@@ -64,7 +64,7 @@
             display: none; justify-content: center; align-items: center; flex-direction: column;
         }
 
-        /* Submit Button Styling - Enhanced (Now Blue/Indigo) */
+        /* Submit Button Styling - Enhanced (Blue/Indigo) */
         .submit-btn {
             /* Blue gradient, larger shadow, and click animation */
             @apply w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-extrabold py-4 /* Increased padding for better touch */
@@ -148,9 +148,11 @@
             <p id="latlongText" class="text-sm font-medium text-gray-500 mt-2">กรุณากดปุ่มพิกัด หรือเลื่อนหมุดเพื่อระบุตำแหน่ง</p>
         </div>
 
-        <!-- 4. รายละเอียด (Detail) - MOVED HERE -->
+        <!-- 4. รายละเอียด (Detail) - Revised Structure -->
         <div>
+            <!-- Label First (section-label) -->
             <label for="detail" class="section-label">4. รายละเอียดเพิ่มเติม</label>
+            <!-- Textarea (input-field) for full width and consistent styling -->
             <textarea id="detail" rows="4" class="input-field resize-none" placeholder="รายละเอียด..."></textarea>
         </div>
         
