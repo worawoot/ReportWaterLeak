@@ -2,304 +2,250 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แจ้งปัญหาท่อประปา MWA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-
     <style>
-        body {
-            font-family: 'Kanit', sans-serif !important;
-        }
+        body { font-family: 'Kanit', sans-serif; }
         .loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.95); z-index: 9999;
             display: none; flex-direction: column; align-items: center; justify-content: center;
         }
-        .map-preview {
-            width: 100%; height: 200px; background-color: #f1f5f9;
-            border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;
-            color: #64748b; font-size: 0.875rem; border: 2px dashed #cbd5e1;
-            margin-top: 0.5rem; overflow: hidden;
-        }
     </style>
 </head>
-<body class="bg-blue-50 min-h-screen">
+<body class="bg-blue-50 min-h-screen pb-10">
 
+    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
-        <p id="loadingText" class="text-blue-800 font-semibold animate-pulse">กำลังโหลด...</p>
+        <p id="loadingText" class="text-blue-800 font-semibold animate-pulse">กำลังทำงาน...</p>
     </div>
 
     <div class="max-w-md mx-auto p-4">
-        <form id="reportForm">
-            <div class="bg-white rounded-2xl p-6 shadow-xl border border-blue-100"> 
-                
-                <!-- Header -->
-                <div class="text-center mb-8">
-                    <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                        </svg>
-                    </div>
-                    <h1 class="text-2xl font-bold text-gray-800">แจ้งปัญหาท่อประปา</h1>
-                    <p class="text-gray-500 text-sm">การประปานครหลวง</p>
-                </div>
+        <div class="bg-white rounded-2xl p-6 shadow-xl border border-blue-100 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
 
-                <!-- Hidden User ID -->
+            <!-- Header -->
+            <div class="text-center mb-6 mt-2">
+                <h1 class="text-2xl font-bold text-gray-800">แจ้งปัญหาท่อประปา</h1>
+                <p class="text-gray-500 text-sm">การประปานครหลวง</p>
+            </div>
+
+            <form id="reportForm" onsubmit="return false;">
+                
                 <input type="hidden" id="userlineId" name="userlineId">
 
-                <!-- 1. Topic Selection -->
+                <!-- 1. เลือกเรื่อง -->
                 <div class="mb-5">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">เรื่องที่ต้องการแจ้ง <span class="text-red-500">*</span></label>
-                    <div class="grid grid-cols-1 gap-3">
-                        <label class="cursor-pointer relative">
-                            <input type="radio" name="issueType" value="ท่อแตกรั่ว" class="peer sr-only" checked>
-                            <div class="p-3 border border-gray-200 rounded-xl hover:bg-blue-50 peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:text-blue-700 transition flex items-center gap-3">
-                                <span class="w-2 h-2 rounded-full bg-blue-500 opacity-0 peer-checked:opacity-100"></span>
-                                💧 ท่อแตกรั่ว
-                            </div>
+                    <div class="space-y-2">
+                        <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition peer-checked:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500">
+                            <input type="radio" name="issueType" value="ท่อแตกรั่ว" class="w-4 h-4 text-blue-600 focus:ring-blue-500" checked>
+                            <span class="ml-3 font-medium text-gray-700">💦 ท่อแตกรั่ว</span>
                         </label>
-                        <label class="cursor-pointer relative">
-                            <input type="radio" name="issueType" value="น้ำไม่ไหล/ไหลอ่อน" class="peer sr-only">
-                            <div class="p-3 border border-gray-200 rounded-xl hover:bg-blue-50 peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:text-blue-700 transition flex items-center gap-3">
-                                <span class="w-2 h-2 rounded-full bg-blue-500 opacity-0 peer-checked:opacity-100"></span>
-                                🚿 น้ำไม่ไหล / ไหลอ่อน
-                            </div>
+                        <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition peer-checked:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500">
+                            <input type="radio" name="issueType" value="น้ำไม่ไหล/ไหลอ่อน" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-3 font-medium text-gray-700">🚿 น้ำไม่ไหล / ไหลอ่อน</span>
                         </label>
-                        <label class="cursor-pointer relative">
-                            <input type="radio" name="issueType" value="น้ำขุ่น/มีกลิ่น" class="peer sr-only">
-                            <div class="p-3 border border-gray-200 rounded-xl hover:bg-blue-50 peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:text-blue-700 transition flex items-center gap-3">
-                                <span class="w-2 h-2 rounded-full bg-blue-500 opacity-0 peer-checked:opacity-100"></span>
-                                🦠 น้ำขุ่น / มีกลิ่น
-                            </div>
+                        <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-blue-50 transition peer-checked:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500">
+                            <input type="radio" name="issueType" value="น้ำขุ่น/มีกลิ่น" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-3 font-medium text-gray-700">🦠 น้ำขุ่น / มีกลิ่น</span>
                         </label>
                     </div>
                 </div>
 
-                <!-- 2. Reporter Name -->
+                <!-- 2. ชื่อผู้แจ้ง -->
                 <div class="mb-4">
-                    <label for="reporterName" class="block text-sm font-semibold text-gray-700 mb-2">ชื่อผู้แจ้ง <span class="text-red-500">*</span></label>
-                    <input type="text" id="reporterName" class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition" placeholder="ระบุชื่อ-นามสกุล">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">ชื่อผู้แจ้ง <span class="text-red-500">*</span></label>
+                    <input type="text" id="reporterName" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="ระบุชื่อ-นามสกุล">
                 </div>
 
-                <!-- 3. Phone -->
+                <!-- 3. เบอร์โทร -->
                 <div class="mb-4">
-                    <label for="phoneNumber" class="block text-sm font-semibold text-gray-700 mb-2">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
-                    <input type="tel" id="phoneNumber" class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition" placeholder="08xxxxxxxx" maxlength="10">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
+                    <input type="tel" id="phoneNumber" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="08xxxxxxxx" maxlength="10">
                 </div>
 
-                <!-- 4. Photo Upload -->
+                <!-- 4. รายละเอียด -->
                 <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">รูปถ่ายปัญหาหน้างาน <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <label for="fileInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition overflow-hidden">
-                            <div id="uploadPlaceholder" class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <p class="text-xs text-gray-500">คลิกเพื่อถ่ายรูปหรือเลือกรูป</p>
-                            </div>
-                            <img id="imagePreview" class="absolute inset-0 w-full h-full object-cover hidden" />
-                            <input id="fileInput" type="file" class="hidden" accept="image/*" />
-                        </label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">รายละเอียดเพิ่มเติม</label>
+                    <textarea id="details" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="เช่น จุดสังเกต, อาการที่พบ"></textarea>
+                </div>
+
+                <!-- 5. พิกัด (GPS) -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">พิกัดจุดเกิดเหตุ <span class="text-red-500">*</span></label>
+                    <div class="flex gap-2">
+                        <input type="text" id="coordinates" class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500 text-sm" readonly placeholder="ยังไม่ได้ระบุพิกัด">
+                        <button type="button" onclick="getLocation()" class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 transition text-sm font-semibold whitespace-nowrap">
+                            📍 รับพิกัด
+                        </button>
+                    </div>
+                    <div id="mapPreview" class="mt-2 hidden rounded-lg overflow-hidden border border-gray-300 h-32">
+                        <!-- Map iframe will be injected here -->
                     </div>
                 </div>
 
-                <!-- 5. Details -->
-                <div class="mb-4">
-                    <label for="details" class="block text-sm font-semibold text-gray-700 mb-2">รายละเอียดเพิ่มเติม</label>
-                    <textarea id="details" rows="3" class="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition" placeholder="เช่น บริเวณหน้าบ้านเลขที่... จุดสังเกต..."></textarea>
-                </div>
-
-                <!-- 6. Coordinates (GPS) -->
+                <!-- 6. รูปถ่าย -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">พิกัดจุดเกิดเหตุ <span class="text-red-500">*</span></label>
-                    <button type="button" onclick="getLocation()" class="w-full bg-indigo-50 text-indigo-600 font-semibold py-2 px-4 rounded-xl border border-indigo-200 hover:bg-indigo-100 transition flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        ระบุพิกัดปัจจุบัน
-                    </button>
-                    <input type="hidden" id="coordinates" name="coordinates">
-                    <div id="mapPreview" class="map-preview hidden">
-                        <iframe id="mapFrame" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">รูปถ่ายหน้างาน <span class="text-red-500">*</span></label>
+                    <div class="relative w-full h-48 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 flex flex-col justify-center items-center cursor-pointer hover:bg-gray-100 transition overflow-hidden" onclick="document.getElementById('fileInput').click()">
+                        <div id="uploadPlaceholder" class="text-center p-4">
+                            <svg class="w-10 h-10 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span class="text-sm text-gray-500">แตะเพื่อถ่ายรูป / เลือกรูป</span>
+                        </div>
+                        <img id="imagePreview" class="absolute inset-0 w-full h-full object-cover hidden">
                     </div>
-                    <p id="locationStatus" class="text-xs text-gray-500 mt-2 text-center"></p>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="previewImage(this)">
                 </div>
 
-                <button type="button" id="submitBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-blue-700 shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5">
+                <button type="button" onclick="submitForm()" id="submitBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 hover:shadow-xl transition transform active:scale-95">
                     แจ้งเหตุทันที
                 </button>
-            </div>
-        </form>
+
+            </form>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-6">MWA Pipe Leak Reporting System</p>
     </div>
 
     <script>
-        // *** CONFIGURATION ***
-        // ใส่ URL Web App ของคุณที่นี่ (URL เดียวกับใน code.gs)
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzKKmAmPlOXxSeALUDe3fr3YLBYXCwEwfNoJbJelKUeg-kvQcQpID7M0qPHVXIN0aUc/exec'; 
+        // *** ตั้งค่า URL ***
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzKKmAmPlOXxSeALUDe3fr3YLBYXCwEwfNoJbJelKUeg-kvQcQpID7M0qPHVXIN0aUc/exec'; // ใส่ URL ที่ได้หลัง Deploy
         const LIFF_ID = '1657790891-40VQpd6O'; 
 
-        // DOM Elements
-        const fileInput = document.getElementById('fileInput');
-        const imagePreview = document.getElementById('imagePreview');
-        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const submitBtn = document.getElementById('submitBtn');
-
-        // Initialize LIFF
-        window.onload = async function() {
-            loadingOverlay.style.display = 'flex';
-            document.getElementById('loadingText').innerText = 'กำลังเชื่อมต่อ LINE...';
+        async function initLiff() {
             try {
                 await liff.init({ liffId: LIFF_ID });
                 if (liff.isLoggedIn()) {
                     const profile = await liff.getProfile();
                     document.getElementById('userlineId').value = profile.userId;
-                    // Auto-fill name if available (Optional)
-                    // document.getElementById('reporterName').value = profile.displayName; 
                 } else {
                     liff.login();
                 }
             } catch (err) {
-                console.error('LIFF Error', err);
-            } finally {
-                loadingOverlay.style.display = 'none';
+                console.error("LIFF Init failed", err);
             }
-        };
+        }
+        window.onload = initLiff;
 
-        // Image Preview Logic
-        fileInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
+        // ฟังก์ชัน Preview รูป
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imagePreview.classList.remove('hidden');
-                    uploadPlaceholder.classList.add('hidden');
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('uploadPlaceholder').classList.add('hidden');
                 }
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(input.files[0]);
             }
-        });
-
-        // Geolocation Logic
-        function getLocation() {
-            const status = document.getElementById('locationStatus');
-            const mapPreview = document.getElementById('mapPreview');
-            const mapFrame = document.getElementById('mapFrame');
-
-            status.textContent = "กำลังค้นหาพิกัด...";
-            
-            if (!navigator.geolocation) {
-                status.textContent = "เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง";
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const coordString = `${lat},${lng}`;
-                    
-                    document.getElementById('coordinates').value = coordString;
-                    status.innerHTML = `<span class="text-green-600">✓ พิกัด: ${lat.toFixed(6)}, ${lng.toFixed(6)}</span>`;
-                    
-                    // Show Map Preview (Embed without API Key works for simple views)
-                    mapPreview.classList.remove('hidden');
-                    mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-                },
-                () => {
-                    status.textContent = "ไม่สามารถระบุตำแหน่งได้ กรุณาเปิด GPS";
-                }
-            );
         }
 
-        // Convert File to Base64
+        // ฟังก์ชันขอพิกัด GPS
+        function getLocation() {
+            const coordInput = document.getElementById('coordinates');
+            const mapDiv = document.getElementById('mapPreview');
+            
+            coordInput.value = "กำลังค้นหา...";
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lng = position.coords.longitude.toFixed(6);
+                    const coords = `${lat},${lng}`;
+                    
+                    coordInput.value = coords;
+                    mapDiv.classList.remove('hidden');
+                    mapDiv.innerHTML = `<iframe width="100%" height="100%" frameborder="0" style="border:0" src="https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed"></iframe>`;
+                }, (error) => {
+                    coordInput.value = "";
+                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถระบุตำแหน่งได้ กรุณาเปิด GPS', 'error');
+                });
+            } else {
+                Swal.fire('ข้อผิดพลาด', 'Browser ไม่รองรับ Geolocation', 'error');
+            }
+        }
+
+        // แปลงไฟล์เป็น Base64
         function getBase64(file) {
             return new Promise((resolve, reject) => {
                 let reader = new FileReader();
+                reader.readAsDataURL(file);
                 reader.onload = () => resolve(reader.result.split(',')[1]);
                 reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
             });
         }
 
-        // Submit Logic
-        submitBtn.addEventListener('click', async () => {
-            // Validation
+        // ส่งข้อมูล
+        async function submitForm() {
             const issueType = document.querySelector('input[name="issueType"]:checked').value;
-            const name = document.getElementById('reporterName').value.trim();
-            const phone = document.getElementById('phoneNumber').value.trim();
-            const details = document.getElementById('details').value.trim();
-            const coords = document.getElementById('coordinates').value;
+            const reporterName = document.getElementById('reporterName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const details = document.getElementById('details').value;
+            const coordinates = document.getElementById('coordinates').value;
+            const fileInput = document.getElementById('fileInput');
             const userlineId = document.getElementById('userlineId').value;
-            const file = fileInput.files[0];
 
-            if (!name || !phone || !coords || !file) {
-                Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน (รวมถึงรูปภาพและพิกัด)', 'warning');
+            // Validation
+            if (!reporterName || !phoneNumber || !coordinates || coordinates.includes("กำลัง") || fileInput.files.length === 0) {
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลที่มี * ให้ครบ (รวมถึงพิกัดและรูปถ่าย)', 'warning');
                 return;
             }
 
-            // Confirm
             const confirm = await Swal.fire({
-                title: 'ยืนยันการแจ้งเหตุ',
-                text: 'ตรวจสอบข้อมูลถูกต้องแล้วใช่หรือไม่?',
+                title: 'ยืนยันการส่งข้อมูล',
+                text: `คุณต้องการแจ้งปัญหา "${issueType}" ใช่หรือไม่?`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'ยืนยัน',
-                cancelButtonText: 'ยกเลิก',
+                cancelButtonText: 'แก้ไข',
                 confirmButtonColor: '#2563EB'
             });
 
-            if (!confirm.isConfirmed) return;
+            if (confirm.isConfirmed) {
+                const overlay = document.getElementById('loadingOverlay');
+                overlay.style.display = 'flex';
+                document.getElementById('submitBtn').disabled = true;
 
-            // Prepare Data
-            loadingOverlay.style.display = 'flex';
-            document.getElementById('loadingText').innerText = 'กำลังส่งข้อมูล...';
-            submitBtn.disabled = true;
+                try {
+                    const base64 = await getBase64(fileInput.files[0]);
+                    
+                    const payload = {
+                        action: 'submitReport',
+                        userlineId: userlineId,
+                        issueType: issueType,
+                        reporterName: reporterName,
+                        phoneNumber: phoneNumber,
+                        details: details,
+                        coordinates: coordinates,
+                        imageName: fileInput.files[0].name,
+                        imageMime: fileInput.files[0].type,
+                        imageBase64: base64
+                    };
 
-            try {
-                const base64 = await getBase64(file);
-                
-                const payload = {
-                    userlineId: userlineId,
-                    issueType: issueType,
-                    reporterName: name,
-                    phoneNumber: phone,
-                    details: details,
-                    coordinates: coords,
-                    imageName: file.name,
-                    imageMime: file.type,
-                    imageBase64: base64
-                };
+                    await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
 
-                // Send to Google Script
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-                
-                if (response.ok) {
-                    await Swal.fire('สำเร็จ!', 'ระบบได้รับแจ้งเหตุเรียบร้อยแล้ว เจ้าหน้าที่จะดำเนินการตรวจสอบโดยเร็ว', 'success');
+                    overlay.style.display = 'none';
+                    await Swal.fire('สำเร็จ', 'ได้รับแจ้งเหตุเรียบร้อยแล้ว', 'success');
                     liff.closeWindow();
-                } else {
-                    throw new Error('Server returned ' + response.status);
-                }
 
-            } catch (error) {
-                console.error(error);
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง', 'error');
-                loadingOverlay.style.display = 'none';
-                submitBtn.disabled = false;
+                } catch (error) {
+                    console.error(error);
+                    overlay.style.display = 'none';
+                    document.getElementById('submitBtn').disabled = false;
+                    Swal.fire('ล้มเหลว', 'เกิดข้อผิดพลาดในการส่งข้อมูล', 'error');
+                }
             }
-        });
+        }
     </script>
 </body>
 </html>
