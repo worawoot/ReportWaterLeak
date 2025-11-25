@@ -17,10 +17,11 @@
 
     <style>
         /* Base Font and Color */
-        body { font-family: 'Sarabun', sans-serif; background-color: #e5e7eb; } /* Lighter gray background */
+        body { font-family: 'Sarabun', sans-serif; background-color: #e5e7eb; } 
         
         /* Custom Input Styling */
         .input-field { 
+            /* Enhanced focus ring and border style */
             @apply w-full border-2 border-gray-200 rounded-xl p-3 bg-white outline-none 
                    transition duration-300 ease-in-out focus:ring-4 focus:ring-blue-100 focus:border-blue-500 
                    shadow-sm text-gray-700; 
@@ -40,20 +41,20 @@
         
         /* Custom Upload Box */
         .upload-box {
-            border: 3px dashed #93c5fd; /* blue-300 */
-            background-color: #eff6ff; /* blue-50 */
+            border: 3px dashed #93c5fd; 
+            background-color: #eff6ff; 
             height: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border-radius: 1rem; /* More rounded */
+            border-radius: 1rem; 
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
         }
-        .upload-box:hover { border-color: #3b82f6; background-color: #dbeafe; } /* blue-500 hover */
+        .upload-box:hover { border-color: #3b82f6; background-color: #dbeafe; } 
         .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 0.75rem; }
         
         /* Loading Overlay */
@@ -63,12 +64,20 @@
             display: none; justify-content: center; align-items: center; flex-direction: column;
         }
 
-        /* Submit Button Styling */
+        /* Submit Button Styling - Enhanced */
         .submit-btn {
-            @apply w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white font-extrabold py-3 
-                   rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-900 
-                   transition duration-300 ease-in-out transform hover:scale-[1.01] 
-                   focus:outline-none focus:ring-4 focus:ring-blue-300;
+            /* More vibrant gradient, larger shadow, and click animation */
+            @apply w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-extrabold py-4 /* Increased padding for better touch */
+                   rounded-xl shadow-2xl hover:from-green-600 hover:to-blue-700 /* Enhanced Hover */
+                   transition duration-300 ease-in-out transform active:scale-[0.98] /* Click effect */
+                   focus:outline-none focus:ring-4 focus:ring-cyan-300; /* New focus color */
+        }
+        
+        /* Footer Bar */
+        .footer-bar {
+            /* Slightly darker gray background to make the button pop */
+            @apply fixed bottom-0 left-0 w-full bg-gray-50 p-4 border-t-2 border-gray-200 
+                   shadow-[0_-5px_20px_rgba(0,0,0,0.1)] sm:absolute sm:bottom-0 sm:left-0 sm:rounded-b-3xl;
         }
     </style>
 </head>
@@ -112,16 +121,10 @@
                 <option value="อื่นๆ">อื่นๆ (ระบุในรายละเอียด)</option>
             </select>
         </div>
-
-        <!-- 2. รายละเอียด (Detail) -->
+        
+        <!-- 2. ภาพปัญหา (Image Upload) -->
         <div>
-            <label for="detail" class="section-label">2. รายละเอียดเพิ่มเติม</label>
-            <textarea id="detail" rows="4" class="input-field resize-none" placeholder="เช่น บริเวณหน้าปากซอย 3/2 มีน้ำรั่วซึมขนาดใหญ่..."></textarea>
-        </div>
-
-        <!-- 3. ภาพปัญหา (Image Upload) -->
-        <div>
-            <label class="section-label">3. ภาพถ่าย ณ จุดเกิดเหตุ <span class="text-red-500">*</span></label>
+            <label class="section-label">2. ภาพถ่าย ณ จุดเกิดเหตุ <span class="text-red-500">*</span></label>
             <div class="upload-box" onclick="document.getElementById('fileInput').click()">
                 <img id="previewImage" class="hidden">
                 <div id="uploadPlaceholder" class="text-center text-blue-500 transition duration-300">
@@ -133,9 +136,9 @@
             <input type="file" id="fileInput" accept="image/*" class="hidden" capture="environment">
         </div>
 
-        <!-- 4. ตำแหน่ง (Map) -->
+        <!-- 3. ตำแหน่ง (Map) -->
         <div>
-            <label class="section-label">4. ระบุตำแหน่งบนแผนที่ <span class="text-red-500">*</span></label>
+            <label class="section-label">3. ระบุตำแหน่งบนแผนที่ <span class="text-red-500">*</span></label>
             <div class="relative">
                 <div id="map"></div>
                 <button type="button" onclick="getCurrentLocation()" class="absolute top-3 right-3 bg-white p-3 rounded-full shadow-lg text-blue-600 hover:bg-blue-50 z-[400] transition duration-200" title="หาพิกัดปัจจุบัน">
@@ -145,6 +148,12 @@
             <p id="latlongText" class="text-sm font-medium text-gray-500 mt-2">กรุณากดปุ่มพิกัด หรือเลื่อนหมุดเพื่อระบุตำแหน่ง</p>
         </div>
 
+        <!-- 4. รายละเอียด (Detail) - MOVED HERE -->
+        <div>
+            <label for="detail" class="section-label">4. รายละเอียดเพิ่มเติม</label>
+            <textarea id="detail" rows="4" class="input-field resize-none" placeholder="เช่น บริเวณหน้าปากซอย 3/2 มีน้ำรั่วซึมขนาดใหญ่ หรือแจ้งเบอร์เสาไฟที่ใกล้ที่สุด..."></textarea>
+        </div>
+        
         <!-- 5. ผู้แจ้ง (Name) -->
         <div>
             <label for="name" class="section-label">5. ชื่อผู้แจ้ง</label>
@@ -160,7 +169,7 @@
     </form>
 
     <!-- Footer Submit Button (Fixed/Sticky) -->
-    <div class="fixed bottom-0 left-0 w-full bg-white p-4 border-t-2 border-gray-100 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] sm:absolute sm:bottom-0 sm:left-0 sm:rounded-b-3xl">
+    <div class="footer-bar">
         <button id="submitBtn" class="submit-btn">
             <i class="fa-solid fa-paper-plane mr-2"></i>
             ส่งข้อความแจ้งเหตุ
@@ -172,8 +181,8 @@
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
     // Config
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby1KI1Av9dntREN3hb86QRAKUWSZeB7HrexeCeiIbwcczTxFbk11is-wqvbEWdLX84L/exec'; // Assume this is a Google Apps Script endpoint
-    const LIFF_ID = '1657790891-40VQpd6O'; // LIFF ID
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby1KI1Av9dntREN3hb86QRAKUWSZeB7HrexeCeiIbwcczTxFbk11is-wqvbEWdLX84L/exec'; 
+    const LIFF_ID = '1657790891-40VQpd6O'; 
     
     // Elements
     const fileInput = document.getElementById('fileInput');
@@ -344,7 +353,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'แจ้งเตือน: ข้อมูลไม่ครบถ้วน',
-                text: 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน (หัวข้อ, เบอร์โทรศัพท์, รูปภาพ และพิกัด)',
+                text: 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน (หัวข้อ, ภาพถ่าย, พิกัด และเบอร์โทรศัพท์)',
                 confirmButtonText: 'รับทราบ',
                 confirmButtonColor: '#EF4444' // Red color for error
             });
@@ -384,7 +393,7 @@
                 // 3. Send data using fetch with retry
                 await fetchWithRetry(WEB_APP_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' }, // Common for Apps Script POST
+                    headers: { 'Content-Type': 'text/plain' }, 
                     body: JSON.stringify(payload)
                 });
 
