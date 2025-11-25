@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบแจ้งเหตุ MWA</title>
+    <title>ระบบแจ้งเหตุ MWA (การประปานครหลวง)</title>
     
     <!-- CSS & Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Leaflet Map CSS -->
@@ -16,85 +16,118 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
-        .input-field { @apply w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 transition; }
-        .section-label { @apply block text-sm font-semibold text-gray-700 mb-1; }
-        #map { height: 250px; width: 100%; border-radius: 0.5rem; z-index: 1; }
+        /* Base Font and Color */
+        body { font-family: 'Sarabun', sans-serif; background-color: #e5e7eb; } /* Lighter gray background */
+        
+        /* Custom Input Styling */
+        .input-field { 
+            @apply w-full border-2 border-gray-200 rounded-xl p-3 bg-white outline-none 
+                   transition duration-300 ease-in-out focus:ring-4 focus:ring-blue-100 focus:border-blue-500 
+                   shadow-sm text-gray-700; 
+        }
+        
+        /* Label Styling */
+        .section-label { @apply block text-sm font-semibold text-gray-800 mb-2; }
+        
+        /* Map Styling */
+        #map { 
+            height: 280px; 
+            width: 100%; 
+            border-radius: 0.75rem; 
+            z-index: 1; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); 
+        }
         
         /* Custom Upload Box */
         .upload-box {
-            border: 2px dashed #d1d5db;
-            background-color: #f9fafb;
+            border: 3px dashed #93c5fd; /* blue-300 */
+            background-color: #eff6ff; /* blue-50 */
             height: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border-radius: 0.5rem;
+            border-radius: 1rem; /* More rounded */
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
         }
-        .upload-box:hover { border-color: #3b82f6; background-color: #eff6ff; }
-        .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        .upload-box:hover { border-color: #3b82f6; background-color: #dbeafe; } /* blue-500 hover */
+        .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 0.75rem; }
         
+        /* Loading Overlay */
         .loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 9999;
+            background: rgba(255,255,255,0.95); z-index: 9999;
             display: none; justify-content: center; align-items: center; flex-direction: column;
+        }
+
+        /* Submit Button Styling */
+        .submit-btn {
+            @apply w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white font-extrabold py-3 
+                   rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-900 
+                   transition duration-300 ease-in-out transform hover:scale-[1.01] 
+                   focus:outline-none focus:ring-4 focus:ring-blue-300;
         }
     </style>
 </head>
 <body>
 
-<!-- Loading -->
+<!-- Loading Overlay -->
 <div id="loadingOverlay" class="loading-overlay">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-3"></div>
-    <span class="text-blue-600 font-medium">กำลังดำเนินการ...</span>
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
+    <span class="text-xl font-bold text-blue-700">กำลังดำเนินการ...</span>
 </div>
 
-<!-- Main Container -->
-<div class="max-w-md mx-auto bg-white min-h-screen shadow-lg sm:my-4 sm:rounded-xl overflow-hidden relative">
+<!-- Main Container (Modern Card Style) -->
+<div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl sm:my-8 sm:rounded-3xl overflow-hidden relative">
     
-    <!-- Header -->
-    <div class="bg-white p-4 border-b flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <h1 class="text-lg font-bold text-gray-800">ระบบแจ้งเหตุท่อประปาแตกรั่ว/เรื่องร้องเรียน</h1>
-        <button onclick="window.location.reload()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-rotate-right"></i></button>
+    <!-- Header (Branded) -->
+    <div class="bg-blue-600 text-white p-5 sticky top-0 z-50 shadow-md">
+        <div class="flex items-center justify-between">
+            <h1 class="text-xl font-extrabold">แจ้งปัญหาการประปา (MWA)</h1>
+            <button onclick="window.location.reload()" class="text-blue-200 hover:text-white transition duration-200" title="Refresh Form">
+                <i class="fa-solid fa-rotate-right text-xl"></i>
+            </button>
+        </div>
+        <p class="text-sm font-light mt-1">ส่งเรื่องท่อแตกรั่ว/ร้องเรียนอย่างรวดเร็ว</p>
     </div>
 
-    <form id="reportForm" class="p-4 space-y-5 pb-20">
+    <form id="reportForm" class="p-5 space-y-6 pb-24">
         
+        <!-- Hidden Inputs for LIFF/Coordinates -->
         <input type="hidden" id="userlineId">
         <input type="hidden" id="coordinates">
 
-        <!-- 1. หัวข้อ -->
+        <!-- 1. หัวข้อ (Topic) -->
         <div>
-            <label class="section-label">หัวข้อ <span class="text-red-500">*</span></label>
-            <select id="topic" class="input-field bg-gray-50">
-                <option value="" disabled selected>เลือกหัวข้อ</option>
+            <label for="topic" class="section-label">1. หัวข้อการแจ้ง <span class="text-red-500">*</span></label>
+            <select id="topic" class="input-field appearance-none bg-white">
+                <option value="" disabled selected>--- เลือกหัวข้อปัญหา ---</option>
                 <option value="ท่อแตกรั่ว">ท่อแตกรั่ว</option>
                 <option value="น้ำไม่ไหล/ไหลอ่อน">น้ำไม่ไหล/ไหลอ่อน</option>
                 <option value="น้ำมีกลิ่น/ขุ่น">น้ำมีกลิ่น/ขุ่น</option>
                 <option value="มิเตอร์หาย/ชำรุด">มิเตอร์หาย/ชำรุด</option>
-                <option value="อื่นๆ">อื่นๆ</option>
+                <option value="อื่นๆ">อื่นๆ (ระบุในรายละเอียด)</option>
             </select>
         </div>
 
-        <!-- 2. รายละเอียด -->
+        <!-- 2. รายละเอียด (Detail) -->
         <div>
-            <label class="section-label">รายละเอียด</label>
-            <textarea id="detail" rows="4" class="input-field bg-gray-50 resize-none" placeholder="รายละเอียด..."></textarea>
+            <label for="detail" class="section-label">2. รายละเอียดเพิ่มเติม</label>
+            <textarea id="detail" rows="4" class="input-field resize-none" placeholder="เช่น บริเวณหน้าปากซอย 3/2 มีน้ำรั่วซึมขนาดใหญ่..."></textarea>
         </div>
 
-        <!-- 3. ภาพปัญหา -->
+        <!-- 3. ภาพปัญหา (Image Upload) -->
         <div>
-            <label class="section-label">ภาพปัญหา <span class="text-red-500">*</span></label>
+            <label class="section-label">3. ภาพถ่าย ณ จุดเกิดเหตุ <span class="text-red-500">*</span></label>
             <div class="upload-box" onclick="document.getElementById('fileInput').click()">
                 <img id="previewImage" class="hidden">
-                <div id="uploadPlaceholder" class="text-center text-gray-400">
-                    <i class="fa-regular fa-image text-4xl mb-2"></i>
-                    <p class="text-sm">แตะเพื่อถ่ายรูป/อัพโหลด</p>
+                <div id="uploadPlaceholder" class="text-center text-blue-500 transition duration-300">
+                    <i class="fa-solid fa-cloud-arrow-up text-5xl mb-2"></i>
+                    <p class="font-medium text-base">แตะเพื่อถ่ายรูปหรือเลือกไฟล์</p>
+                    <p class="text-xs text-gray-500 mt-1">รองรับไฟล์ภาพ .jpg, .png</p>
                 </div>
             </div>
             <input type="file" id="fileInput" accept="image/*" class="hidden" capture="environment">
@@ -102,34 +135,35 @@
 
         <!-- 4. ตำแหน่ง (Map) -->
         <div>
-            <label class="section-label">ตำแหน่ง <span class="text-red-500">*</span></label>
+            <label class="section-label">4. ระบุตำแหน่งบนแผนที่ <span class="text-red-500">*</span></label>
             <div class="relative">
                 <div id="map"></div>
-                <button type="button" onclick="getCurrentLocation()" class="absolute top-2 right-2 bg-white p-2 rounded shadow text-blue-600 hover:text-blue-800 z-[400]">
+                <button type="button" onclick="getCurrentLocation()" class="absolute top-3 right-3 bg-white p-3 rounded-full shadow-lg text-blue-600 hover:bg-blue-50 z-[400] transition duration-200" title="หาพิกัดปัจจุบัน">
                     <i class="fa-solid fa-location-crosshairs text-xl"></i>
                 </button>
             </div>
-            <p id="latlongText" class="text-xs text-gray-400 mt-1">กรุณากดปุ่มพิกัด หรือเลื่อนหมุดเพื่อระบุตำแหน่ง</p>
+            <p id="latlongText" class="text-sm font-medium text-gray-500 mt-2">กรุณากดปุ่มพิกัด หรือเลื่อนหมุดเพื่อระบุตำแหน่ง</p>
         </div>
 
-        <!-- 5. ผู้แจ้ง -->
+        <!-- 5. ผู้แจ้ง (Name) -->
         <div>
-            <label class="section-label">ผู้แจ้ง</label>
-            <input type="text" id="name" class="input-field" placeholder="ชื่อผู้แจ้ง">
+            <label for="name" class="section-label">5. ชื่อผู้แจ้ง</label>
+            <input type="text" id="name" class="input-field" placeholder="ชื่อ-นามสกุล (ถ้าไม่ระบุ จะใช้ชื่อ Line)">
         </div>
 
-        <!-- 6. เบอร์โทรศัพท์ -->
+        <!-- 6. เบอร์โทรศัพท์ (Phone) -->
         <div>
-            <label class="section-label">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
-            <input type="tel" id="phone" class="input-field" placeholder="เบอร์โทรศัพท์..." maxlength="10">
+            <label for="phone" class="section-label">6. เบอร์โทรศัพท์ติดต่อ <span class="text-red-500">*</span></label>
+            <input type="tel" id="phone" class="input-field" placeholder="ตัวอย่าง: 08XXXXXXXX" maxlength="10">
         </div>
 
     </form>
 
-    <!-- Footer Button -->
-    <div class="fixed bottom-0 left-0 w-full bg-white p-4 border-t shadow-lg sm:absolute">
-        <button id="submitBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow-md">
-            ส่งข้อความ
+    <!-- Footer Submit Button (Fixed/Sticky) -->
+    <div class="fixed bottom-0 left-0 w-full bg-white p-4 border-t-2 border-gray-100 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] sm:absolute sm:bottom-0 sm:left-0 sm:rounded-b-3xl">
+        <button id="submitBtn" class="submit-btn">
+            <i class="fa-solid fa-paper-plane mr-2"></i>
+            ส่งข้อความแจ้งเหตุ
         </button>
     </div>
 </div>
@@ -138,9 +172,9 @@
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
     // Config
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby1KI1Av9dntREN3hb86QRAKUWSZeB7HrexeCeiIbwcczTxFbk11is-wqvbEWdLX84L/exec'; 
-    const LIFF_ID = '1657790891-40VQpd6O'; 
-
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby1KI1Av9dntREN3hb86QRAKUWSZeB7HrexeCeiIbwcczTxFbk11is-wqvbEWdLX84L/exec'; // Assume this is a Google Apps Script endpoint
+    const LIFF_ID = '1657790891-40VQpd6O'; // LIFF ID
+    
     // Elements
     const fileInput = document.getElementById('fileInput');
     const previewImage = document.getElementById('previewImage');
@@ -152,6 +186,23 @@
     let currentLat = 13.7563; // Default Bangkok
     let currentLng = 100.5018;
 
+    // --- UTILITY: Exponential Backoff for API Calls ---
+    async function fetchWithRetry(url, options, retries = 3) {
+        for (let i = 0; i < retries; i++) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response;
+            } catch (error) {
+                if (i === retries - 1) {
+                    throw error;
+                }
+                const delay = Math.pow(2, i) * 1000; // 1s, 2s, 4s
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    }
+
     // --- INIT ---
     window.onload = async function() {
         initMap();
@@ -160,6 +211,7 @@
 
     // --- MAP LOGIC ---
     function initMap() {
+        // Initialize map with default Bangkok coordinates
         map = L.map('map').setView([currentLat, currentLng], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
@@ -170,7 +222,7 @@
         
         // Update input on drag
         marker.on('dragend', function(event) {
-            var position = marker.getLatLng();
+            const position = marker.getLatLng();
             updateCoordinates(position.lat, position.lng);
         });
 
@@ -179,41 +231,72 @@
     }
 
     function getCurrentLocation() {
+        // Check for GeoLocation API availability
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 
+                // Move map and marker to current location
                 map.setView([lat, lng], 16);
                 marker.setLatLng([lat, lng]);
                 updateCoordinates(lat, lng);
-            }, () => {
-                // Error handled silently, default map stays
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    title: 'ระบุตำแหน่งปัจจุบันแล้ว',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }, (error) => {
+                // Handle permission denial or error gracefully
+                 Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'ไม่สามารถระบุพิกัดอัตโนมัติได้',
+                    text: 'กรุณาเลื่อนหมุดในแผนที่เพื่อระบุตำแหน่ง',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        } else {
+             Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: 'เบราว์เซอร์ไม่รองรับ Geolocation',
+                showConfirmButton: false,
+                timer: 3000
             });
         }
     }
 
     function updateCoordinates(lat, lng) {
+        // Update hidden input and displayed text
         document.getElementById('coordinates').value = `${lat.toFixed(6)},${lng.toFixed(6)}`;
-        document.getElementById('latlongText').innerText = `พิกัด: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        document.getElementById('latlongText').innerText = `พิกัดปัจจุบัน: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     }
 
-    // --- LIFF LOGIC ---
+    // --- LIFF LOGIC (Authentication) ---
     async function initLiff() {
         try {
             await liff.init({ liffId: LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
                 document.getElementById('userlineId').value = profile.userId;
-                // Auto fill name if available
+                // Auto fill name if available and not already typed
                 if(!document.getElementById('name').value) {
                     document.getElementById('name').value = profile.displayName;
                 }
             } else {
+                // If not logged in, force login (essential for LIFF apps)
                 liff.login();
             }
         } catch (err) {
-            console.error(err);
+            console.error('LIFF initialization failed:', err);
         }
     }
 
@@ -226,49 +309,58 @@
                 previewImage.src = e.target.result;
                 previewImage.classList.remove('hidden');
                 uploadPlaceholder.classList.add('hidden');
+                
+                // Animate upload box on successful preview
+                const uploadBox = document.querySelector('.upload-box');
+                uploadBox.style.borderColor = '#10b981'; // green-500
+                uploadBox.style.backgroundColor = '#ecfdf5'; // green-50
             }
             reader.readAsDataURL(file);
         }
     });
 
+    // Helper to convert file to Base64 (needed for Google Apps Script/API post)
     function getBase64(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
+            // Split to get only the base64 string without data MIME prefix
+            reader.onload = () => resolve(reader.result.split(',')[1]); 
             reader.onerror = error => reject(error);
         });
     }
 
-    // --- SUBMIT ---
+    // --- SUBMIT LOGIC ---
     document.getElementById('submitBtn').addEventListener('click', async (e) => {
         e.preventDefault();
 
-        // Validation
+        // 1. Validation
         const topic = document.getElementById('topic').value;
-        const phone = document.getElementById('phone').value;
+        const phone = document.getElementById('phone').value.replace(/[^0-9]/g, ''); // Clean phone number
         const coords = document.getElementById('coordinates').value;
-        const hasImage = !previewImage.classList.contains('hidden');
+        const hasImage = fileInput.files.length > 0;
 
-        if (!topic || !phone || !coords || !hasImage) {
+        if (!topic || phone.length < 9 || !coords || !hasImage) {
             Swal.fire({
-                icon: 'warning',
-                title: 'ข้อมูลไม่ครบ',
-                text: 'กรุณากรอกข้อมูลที่มี * ให้ครบถ้วน (รวมถึงรูปภาพและพิกัด)',
-                confirmButtonColor: '#2563EB'
+                icon: 'error',
+                title: 'แจ้งเตือน: ข้อมูลไม่ครบถ้วน',
+                text: 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน (หัวข้อ, เบอร์โทรศัพท์, รูปภาพ และพิกัด)',
+                confirmButtonText: 'รับทราบ',
+                confirmButtonColor: '#EF4444' // Red color for error
             });
             return;
         }
 
-        // Confirm
+        // 2. Confirmation Dialog
         const result = await Swal.fire({
             title: 'ยืนยันการแจ้งเหตุ',
-            text: 'ตรวจสอบข้อมูลถูกต้องแล้ว?',
+            html: `คุณกำลังจะส่งแจ้งเหตุ <b>"${document.getElementById('topic').options[document.getElementById('topic').selectedIndex].text}"</b><br>โทรศัพท์: <b>${phone}</b><br>โปรดยืนยันข้อมูลทั้งหมดถูกต้อง`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'ยืนยัน ส่งข้อมูล',
-            cancelButtonText: 'ยกเลิก',
-            confirmButtonColor: '#2563EB'
+            confirmButtonText: '<i class="fa-solid fa-check-circle mr-1"></i> ยืนยัน ส่งข้อมูล',
+            cancelButtonText: '<i class="fa-solid fa-times-circle mr-1"></i> ยกเลิก',
+            confirmButtonColor: '#10B981', // Green confirm
+            cancelButtonColor: '#6B7280', // Gray cancel
         });
 
         if (result.isConfirmed) {
@@ -276,7 +368,7 @@
 
             try {
                 const file = fileInput.files[0];
-                const base64 = await getBase64(file);
+                const base64 = await getBase64(file); // Convert image to base64 string
 
                 const payload = {
                     userlineId: document.getElementById('userlineId').value,
@@ -289,31 +381,41 @@
                     fileName: file.name || 'image.png'
                 };
 
-                await fetch(WEB_APP_URL, {
+                // 3. Send data using fetch with retry
+                await fetchWithRetry(WEB_APP_URL, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' }, // Common for Apps Script POST
                     body: JSON.stringify(payload)
                 });
 
                 loadingOverlay.style.display = 'none';
                 
+                // 4. Success Message
                 await Swal.fire({
                     icon: 'success',
-                    title: 'ส่งข้อมูลสำเร็จ',
-                    text: 'เจ้าหน้าที่ได้รับเรื่องแล้ว',
-                    confirmButtonText: 'ปิด',
-                    confirmButtonColor: '#2563EB'
+                    title: 'ส่งข้อมูลสำเร็จ!',
+                    text: 'การแจ้งเหตุของคุณถูกส่งถึงเจ้าหน้าที่เรียบร้อยแล้ว และจะได้รับการดำเนินการต่อไป',
+                    confirmButtonText: 'ปิดหน้าจอ',
+                    confirmButtonColor: '#10B981'
                 });
 
+                // 5. Close LIFF window or refresh
                 if (liff.isInClient()) {
                     liff.closeWindow();
                 } else {
-                    window.location.reload();
+                    // For browser testing
+                    window.location.reload(); 
                 }
 
             } catch (error) {
-                console.error(error);
+                console.error('Submission Error:', error);
                 loadingOverlay.style.display = 'none';
-                Swal.fire('Error', 'เกิดข้อผิดพลาดในการส่งข้อมูล', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
+                    text: 'กรุณาลองใหม่อีกครั้ง หรือติดต่อเจ้าหน้าที่โดยตรง',
+                    confirmButtonColor: '#EF4444'
+                });
             }
         }
     });
