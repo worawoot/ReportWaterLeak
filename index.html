@@ -19,7 +19,7 @@
         /* Base Font and Color */
         body { font-family: 'Sarabun', sans-serif; background-color: #e5e7eb; } 
         
-        /* Custom Input Styling */
+        /* Custom Input Styling (For standard solid inputs) */
         .input-field { 
             /* Enhanced focus ring and border style */
             @apply w-full border-2 border-gray-200 rounded-xl p-3 bg-white outline-none 
@@ -57,6 +57,27 @@
         .upload-box:hover { border-color: #3b82f6; background-color: #dbeafe; } 
         .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; border-radius: 0.75rem; }
         
+        /* Custom Dashed Textarea Style (Matching Upload Box) - NEW STYLE */
+        .dashed-input {
+            /* Shared styles */
+            @apply w-full rounded-xl p-3 shadow-sm text-gray-700 transition duration-300 ease-in-out;
+                   
+            /* Unique styles from .upload-box */
+            height: 200px;
+            width: 100%;
+            border: 3px dashed #93c5fd; /* Blue dashed border */
+            background-color: #eff6ff; /* Light blue background */
+            resize: none; /* Disable resizing */
+            outline: none; /* Remove default browser outline */
+        }
+        .dashed-input:focus {
+            /* Focus/Hover state similar to .upload-box:hover */
+            border-color: #3b82f6; 
+            background-color: #dbeafe;
+            /* Adding a mild focus ring effect manually */
+            box-shadow: 0 0 0 2px #dbeafe, 0 0 0 4px #93c5fd; 
+        }
+
         /* Loading Overlay */
         .loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -148,12 +169,12 @@
             <p id="latlongText" class="text-sm font-medium text-gray-500 mt-2">กรุณากดปุ่มพิกัด หรือเลื่อนหมุดเพื่อระบุตำแหน่ง</p>
         </div>
 
-        <!-- 4. รายละเอียด (Detail) - Revised Structure -->
+        <!-- 4. รายละเอียด (Detail) - USING NEW STYLING -->
         <div>
             <!-- Label First (section-label) -->
             <label for="detail" class="section-label">4. รายละเอียดเพิ่มเติม</label>
-            <!-- Textarea (input-field) for full width and consistent styling -->
-            <textarea id="detail" rows="4" class="input-field resize-none" placeholder="รายละเอียด..."></textarea>
+            <!-- Textarea using the new 'dashed-input' style -->
+            <textarea id="detail" class="dashed-input" placeholder="รายละเอียด..."></textarea>
         </div>
         
         <!-- 5. ผู้แจ้ง (Name) -->
