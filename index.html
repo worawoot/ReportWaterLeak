@@ -242,9 +242,12 @@ async function sendFlexMessage() {
     let rawPhone = keynumberIdInput.value;
     let formattedPhone = rawPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
 
+    // **แก้ไข 3.1: กำหนดค่า Details สำหรับ Flex Message**
+    const detailsText = keynumber2IdInput.value.trim() || 'ไม่ได้ระบุรายละเอียด';
+
     const flexMessage = {
       "type": "flex",
-      "altText": "ลงทะเบียนสำเร็จ: MWA e-Bill",
+      "altText": "แจ้งเหตุ/ลงทะเบียน: MWA e-Service",
       "contents": {
         "type": "bubble",
         "size": "mega",
@@ -406,15 +409,17 @@ async function sendFlexMessage() {
               "layout": "horizontal",
               "contents": [
                 {
+                  // **แก้ไข 3.2: เปลี่ยนป้ายกำกับเป็น "รายละเอียด"**
                   "type": "text",
-                  "text": "อีเมล",
+                  "text": "รายละเอียด",
                   "size": "sm",
                   "color": "#555555",
                   "flex": 1
                 },
                 {
+                  // **แก้ไข 3.3: ใช้ detailsText ที่เตรียมไว้**
                   "type": "text",
-                  "text": keynumber2IdInput.value || '-',
+                  "text": detailsText,
                   "size": "xs",
                   "color": "#111111",
                   "align": "end",
@@ -570,8 +575,12 @@ function validateForm() {
     const nameId = nameIdInput.value.trim();
     const keynumberId = keynumberIdInput.value.trim();
     const keynumber3Id = keynumber3IdInput.value.trim();
+
+    // **แก้ไข 4: เพิ่มการตรวจสอบเบอร์โทรศัพท์ใน validateForm**
+    const keynumberVal = keynumberIdInput.value.trim();
+    const isPhoneValid = /^0\d{9}$/.test(keynumberVal);
     
-    if (userlineId === '' || nameId === '' || keynumberId === '' || keynumber3Id === '' ) {
+    if (userlineId === '' || nameId === '' || keynumberId === '' || keynumber3Id === '' || !isPhoneValid) {
         return false;
     }
     return true;
@@ -617,17 +626,7 @@ submitBtn.addEventListener('click', async (event) => {
     }    
 
     // REMOVED: ลบส่วนตรวจสอบ keynumber3Id แบบตัวเลข 8 หลักออก
-    // เพราะตอนนี้เป็น Dropdown ข้อความแล้ว
-
-    const keynumberVal = keynumberIdInput.value.trim();
-    if (!/^0\d{9}$/.test(keynumberVal)) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'เบอร์โทรศัพท์ไม่ถูกต้อง',
-            text: 'กรุณากรอกเบอร์โทรศัพท์ 10 หลัก ให้ถูกต้อง (ตัวเลขเท่านั้นและขึ้นต้นด้วย 0)',
-        });
-        return;
-    }
+    // เพราะตอนนี้เป็น Dropdown ข้อความแล้ว    
     
     const isConfirmed = await showConfirmationDialog();
 
@@ -650,6 +649,7 @@ submitBtn.addEventListener('click', async (event) => {
                     userlineId: userlineIdInput.value,
                     nameId: nameIdInput.value,
                     keynumberId: keynumberIdInput.value,
+                    keynumber2Id: keynumber2IdInput.value, // <--- เพิ่ม
                     keynumber3Id: keynumber3IdInput.value,
                     keynumber4Id: keynumber4IdInput.checked,
                     keynumber5Id: keynumber5IdInput.checked
