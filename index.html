@@ -39,7 +39,7 @@
         flex-direction: column;
     }        
     </style>
-    
+     
 </head>
 <body class="bg-slate-100 min-h-screen">
 
@@ -47,7 +47,7 @@
     <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
     <p id="loadingText" class="text-gray-600 font-semibold">กรุณารอสักครู่...</p>
 </div>
-    
+     
 <div class="max-w-md m-auto p-2">
         <form>
             <div class="bg-white rounded-lg p-10 shadow-md"> 
@@ -70,17 +70,29 @@
                         อัพโหลดรูป
                         <input type="file" id="file" name="file" accept="image/*" class="hidden">
                     </label>
-                    <div class="mx-auto w-48 text-slate-500 text-xs text-center mt-1 hidden">คลิกเพื่ออัพโหลดรูปของคุณ</div>                     
+                    <div class="mx-auto w-48 text-slate-500 text-xs text-center mt-1 hidden">คลิกเพื่ออัพโหลดรูปของคุณ</div>                      
                 </div>
                 
-                <div class="flex flex-col">            
+                <div class="flex flex-col">                      
                 <div class="mb-4">
                     <input type="text" class="hidden" id="userlineId" placeholder="lineId" name="userlineId" readonly>
                 </div>
 
+                <!-- แก้ไขส่วนนี้: เปลี่ยนจาก Input เป็น Select -->
                 <div class="mb-4">
                     <label for="keynumber3Id" class="block text-sm font-semibold text-gray-700 mb-2">เรื่อง <span style="color: #f90202">*</span></label>
-                    <input type="text" class="input-field w-full border border-slate-300 p-2 text-md rounded-lg" id="keynumber3Id" placeholder="เลือกเรื่องที่ต้องการแจ้ง" name="keynumber3Id" required>
+                    <div class="relative">
+                        <select class="input-field w-full border border-slate-300 p-2 text-md rounded-lg appearance-none bg-white" id="keynumber3Id" name="keynumber3Id" required>
+                            <option value="" disabled selected>เลือกเรื่องที่ต้องการแจ้ง</option>
+                            <option value="ท่อแตกรั่ว">1. ท่อแตกรั่ว</option>
+                            <option value="น้ำไหลอ่อน/ไม่ไหล">2. น้ำไหลอ่อน/ไม่ไหล</option>
+                            <option value="น้ำขุ่น/มีกลิ่น">3. น้ำขุ่น/มีกลิ่น</option>
+                            <option value="มิเตอร์หาย">4. มิเตอร์หาย</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
                 </div>
                     
                 <div class="mb-4">
@@ -124,7 +136,7 @@
                 <button type="button" id="submitBtn" class="bg-blue-500 text-center w-full text-white py-4 px-4 rounded-lg hover:bg-blue-700">ส่งข้อมูลลงทะเบียน</button>
                 
                 <footer class="text-center text-sm text-gray-600 mt-8">Copyright © 2025 WORAWOOT PHAENGPETCH</footer>
-            </div>          
+            </div>           
             
         </form>
 </div>
@@ -197,7 +209,6 @@ async function getUserProfile() {
 }
 
 // --- Auto-Select Logic ---
-// เมื่อเลือก e-Tax (keynumber5Id) ให้เลือก e-Bill (keynumber4Id) อัตโนมัติ
 keynumber5IdInput.addEventListener('change', function() {
     if (this.checked) {
         keynumber4IdInput.checked = true;
@@ -213,7 +224,6 @@ async function sendFlexMessage() {
         return; 
     }
 
-    // Logic การแสดงผล Badge สถานะ
     const isBill = keynumber4IdInput.checked;
     const textBill = isBill ? 'สมัครใช้บริการ' : 'ไม่สมัคร';
     const colorBillText = isBill ? '#1DB446' : '#aaaaaa';
@@ -224,7 +234,6 @@ async function sendFlexMessage() {
     const colorTaxText = isTax ? '#1DB446' : '#aaaaaa';
     const colorTaxBg = isTax ? '#E8F7EC' : '#f0f0f0';
 
-    // จัด Format เบอร์โทรศัพท์ (081-234-5678) เพื่อความสวยงาม
     let rawPhone = keynumberIdInput.value;
     let formattedPhone = rawPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
 
@@ -323,7 +332,7 @@ async function sendFlexMessage() {
               "contents": [
                 {
                   "type": "text",
-                  "text": "ทะเบียนผู้ใช้น้ำ",
+                  "text": "เรื่องที่แจ้ง",
                   "size": "sm",
                   "color": "#555555",
                   "flex": 2
@@ -335,7 +344,8 @@ async function sendFlexMessage() {
                   "color": "#111111",
                   "align": "end",
                   "flex": 3,
-                  "weight": "bold"
+                  "weight": "bold",
+                  "wrap": true
                 }
               ],
               "margin": "md"
@@ -579,7 +589,7 @@ async function showConfirmationDialog() {
 submitBtn.addEventListener('click', async (event) => {
     event.preventDefault();
 
-    // 1. ตรวจสอบ Input ทั่วไป (ชื่อ, เบอร์, ทะเบียนผู้ใช้น้ำ)
+    // 1. ตรวจสอบ Input ทั่วไป
     if (!validateForm()) {
         Swal.fire({
             icon: 'warning',
@@ -589,10 +599,9 @@ submitBtn.addEventListener('click', async (event) => {
         return;
     }
 
-    // 2. ตรวจสอบเงื่อนไข Checkbox (Auto-select ทำให้กรณี e-Tax only แทบไม่เกิด แต่เช็คไว้กันพลาด)
+    // 2. ตรวจสอบเงื่อนไข Checkbox
     const isEBillChecked = keynumber4IdInput.checked;
 
-    // เงื่อนไขบังคับ: ต้องเลือก e-Bill เสมอ
     if (!isEBillChecked) {
         Swal.fire({
             icon: 'warning',
@@ -602,15 +611,8 @@ submitBtn.addEventListener('click', async (event) => {
         return;
     }    
 
-    const keynumber3Val = keynumber3IdInput.value.trim();
-    if (!/^\d{8}$/.test(keynumber3Val)) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'ข้อมูลไม่ถูกต้อง',
-            text: 'กรุณากรอกทะเบียนผู้ใช้น้ำเป็นตัวเลข 8 หลักเท่านั้น',
-        });
-        return;
-    }
+    // REMOVED: ลบส่วนตรวจสอบ keynumber3Id แบบตัวเลข 8 หลักออก
+    // เพราะตอนนี้เป็น Dropdown ข้อความแล้ว
 
     const keynumberVal = keynumberIdInput.value.trim();
     if (!/^0\d{9}$/.test(keynumberVal)) {
@@ -627,11 +629,11 @@ submitBtn.addEventListener('click', async (event) => {
     if (isConfirmed) {
         submitBtn.disabled = true;
         loadingText.innerText = "กำลังบันทึกข้อมูล...";
-        loadingOverlay.style.display = 'flex';      
+        loadingOverlay.style.display = 'flex';       
 
         try {
-            let obj;             
-            if (fileInput.files.length > 0) {               
+            let obj;              
+            if (fileInput.files.length > 0) {                
                 let file = fileInput.files[0];
                 let base64 = await getBase64(file);
                 imgPreview.src = `data:${file.type};base64,${base64}`;
