@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบรับแจ้งเหตุ/ท่อประปาแตกรั่ว</title>
+    <title>ลงทะเบียน MWA e-Bill</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -39,7 +39,7 @@
         flex-direction: column;
     }        
     </style>
-     
+    
 </head>
 <body class="bg-slate-100 min-h-screen">
 
@@ -47,62 +47,40 @@
     <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
     <p id="loadingText" class="text-gray-600 font-semibold">กรุณารอสักครู่...</p>
 </div>
-     
+    
 <div class="max-w-md m-auto p-2">
         <form>
             <div class="bg-white rounded-lg p-10 shadow-md"> 
 
                 <div class="text-center mb-6">
-                    <h1 class="text-2xl font-bold text-blue-600">ระบบรับแจ้งเหตุ/ท่อประปาแตกรั่ว</h1>                    
+                    <h1 class="text-2xl font-bold text-blue-600">ลงทะเบียน MWA e-Bill</h1>                    
                 </div>
                 
-                <!-- ส่วนแสดงผลรูปโปรไฟล์และปุ่มอัพโหลดแบบใหม่ -->
                 <div class="mb-5 text-center">
-                    <div class="relative mx-auto w-64 h-64 mb-4 group">
+                    <div class="mx-auto w-36 h-36 mb-4 relative">
                         <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" 
                              alt="Profile Image" 
                              id="preview" 
-                             class="w-64 h-64 object-cover rounded-2xl border-4 border-white shadow-lg mx-auto bg-slate-100">
-                        
-                        <!-- ปุ่มอัพโหลดรูปไอคอนกล้อง (Camera Icon Button) -->
-                        <label for="file" class="absolute bottom-1 right-1 bg-white p-2.5 rounded-full shadow-md cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 border border-slate-200 group-hover:scale-110 active:scale-95">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <input type="file" id="file" name="file" accept="image/*" class="hidden">
-                        </label>
+                             class="w-36 h-36 object-cover rounded-full border-4 border-white shadow-lg mx-auto bg-slate-100">
                     </div>
 
-                    <div id="displayName" class="text-xl text-slate-700 font-bold mt-2 hidden"></div>
-                    <p class="text-xs text-slate-400 mt-1">แตะที่รูปกล้องเพื่อใส่รูปภาพ</p>                  
+                    <div id="displayName" class="text-xl text-slate-700 font-bold mt-3 mb-2"></div>
+                    
+                    <label for="file" class="cursor-pointer inline-flex justify-between items-center p-2 rounded-lg text-slate-800 bg-slate-100 hover:bg-slate-300 hidden">
+                        อัพโหลดรูป
+                        <input type="file" id="file" name="file" accept="image/*" class="hidden">
+                    </label>
+                    <div class="mx-auto w-48 text-slate-500 text-xs text-center mt-1 hidden">คลิกเพื่ออัพโหลดรูปของคุณ</div>                     
                 </div>
                 
-                <div class="flex flex-col">                      
+                <div class="flex flex-col">            
                 <div class="mb-4">
                     <input type="text" class="hidden" id="userlineId" placeholder="lineId" name="userlineId" readonly>
                 </div>
 
-                <!-- แก้ไขส่วนนี้: เปลี่ยนจาก Input เป็น Select -->
                 <div class="mb-4">
-                    <label for="keynumber3Id" class="block text-sm font-semibold text-gray-700 mb-2">เรื่อง <span style="color: #f90202">*</span></label>
-                    <div class="relative">
-                        <select class="input-field w-full border border-slate-300 p-2 text-md rounded-lg appearance-none bg-white" id="keynumber3Id" name="keynumber3Id" required>
-                            <option value="" disabled selected>เลือกเรื่องที่ต้องการแจ้ง</option>
-                            <option value="ท่อแตกรั่ว">ท่อแตกรั่ว</option>
-                            <option value="น้ำไหลอ่อน/ไม่ไหล">น้ำไหลอ่อน/ไม่ไหล</option>
-                            <option value="น้ำขุ่น/มีกลิ่น">น้ำขุ่น/มีกลิ่น</option>
-                            <option value="มิเตอร์หาย">มิเตอร์หาย</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <label for="keynumber2Id" class="block text-sm font-semibold text-gray-700 mb-2">รายละเอียด</label>
-                    <textarea class="input-field w-full border border-slate-300 p-2 text-md rounded-lg" id="keynumber2Id" placeholder="กรอกรายละเอียด..." name="keynumber2Id" rows="4"></textarea>
+                    <label for="keynumber3Id" class="block text-sm font-semibold text-gray-700 mb-2">ทะเบียนผู้ใช้น้ำ <span style="color: #f90202">*</span></label>
+                    <input type="text" class="input-field w-full border border-slate-300 p-2 text-md rounded-lg" id="keynumber3Id" placeholder="กรอกทะเบียนผู้ใช้น้ำ 8 หลัก" name="keynumber3Id" required>
                 </div>
                     
                 <div class="mb-4">
@@ -113,8 +91,13 @@
                 <div class="mb-4">
                     <label for="keynumberId" class="block text-sm font-semibold text-gray-700 mb-2">เบอร์โทรศัพท์ (10 หลัก) <span style="color: #f90202">*</span></label>
                     <input type="tel" class="input-field w-full border border-slate-300 p-2 text-md rounded-lg" id="keynumberId" placeholder="เช่น 0812345678" pattern="^0\d{9}$" title="กรุณากรอกเบอร์โทรศัพท์ 10 หลัก ที่ขึ้นต้นด้วย 0" name="keynumberId" maxlength="10" inputmode="numeric" required>
-                </div>             
-                                    
+                </div>
+                    
+                <div class="mb-6">
+                    <label for="keynumber2Id" class="block text-sm font-semibold text-gray-700 mb-2">E-mail </label>
+                    <input type="email" class="input-field w-full border border-slate-300 p-2 text-md rounded-lg" id="keynumber2Id" placeholder="example@mail.com" name="keynumber2Id" >
+                </div>
+
                 <div class="mb-6 space-y-3">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         เลือกประเภทเอกสารที่ต้องการรับ (e-Service) <span style="color: #f90202">*</span>
@@ -141,7 +124,7 @@
                 <button type="button" id="submitBtn" class="bg-blue-500 text-center w-full text-white py-4 px-4 rounded-lg hover:bg-blue-700">ส่งข้อมูลลงทะเบียน</button>
                 
                 <footer class="text-center text-sm text-gray-600 mt-8">Copyright © 2025 WORAWOOT PHAENGPETCH</footer>
-            </div>           
+            </div>          
             
         </form>
 </div>
@@ -214,6 +197,7 @@ async function getUserProfile() {
 }
 
 // --- Auto-Select Logic ---
+// เมื่อเลือก e-Tax (keynumber5Id) ให้เลือก e-Bill (keynumber4Id) อัตโนมัติ
 keynumber5IdInput.addEventListener('change', function() {
     if (this.checked) {
         keynumber4IdInput.checked = true;
@@ -229,6 +213,7 @@ async function sendFlexMessage() {
         return; 
     }
 
+    // Logic การแสดงผล Badge สถานะ
     const isBill = keynumber4IdInput.checked;
     const textBill = isBill ? 'สมัครใช้บริการ' : 'ไม่สมัคร';
     const colorBillText = isBill ? '#1DB446' : '#aaaaaa';
@@ -239,15 +224,13 @@ async function sendFlexMessage() {
     const colorTaxText = isTax ? '#1DB446' : '#aaaaaa';
     const colorTaxBg = isTax ? '#E8F7EC' : '#f0f0f0';
 
+    // จัด Format เบอร์โทรศัพท์ (081-234-5678) เพื่อความสวยงาม
     let rawPhone = keynumberIdInput.value;
     let formattedPhone = rawPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
 
-    // **แก้ไข 3.1: กำหนดค่า Details สำหรับ Flex Message**
-    const detailsText = keynumber2IdInput.value.trim() || 'ไม่ได้ระบุรายละเอียด';
-
     const flexMessage = {
       "type": "flex",
-      "altText": "แจ้งเหตุ/ลงทะเบียน: MWA e-Service",
+      "altText": "ลงทะเบียนสำเร็จ: MWA e-Bill",
       "contents": {
         "type": "bubble",
         "size": "mega",
@@ -340,7 +323,7 @@ async function sendFlexMessage() {
               "contents": [
                 {
                   "type": "text",
-                  "text": "เรื่องที่แจ้ง",
+                  "text": "ทะเบียนผู้ใช้น้ำ",
                   "size": "sm",
                   "color": "#555555",
                   "flex": 2
@@ -352,8 +335,7 @@ async function sendFlexMessage() {
                   "color": "#111111",
                   "align": "end",
                   "flex": 3,
-                  "weight": "bold",
-                  "wrap": true
+                  "weight": "bold"
                 }
               ],
               "margin": "md"
@@ -409,17 +391,15 @@ async function sendFlexMessage() {
               "layout": "horizontal",
               "contents": [
                 {
-                  // **แก้ไข 3.2: เปลี่ยนป้ายกำกับเป็น "รายละเอียด"**
                   "type": "text",
-                  "text": "รายละเอียด",
+                  "text": "อีเมล",
                   "size": "sm",
                   "color": "#555555",
                   "flex": 1
                 },
                 {
-                  // **แก้ไข 3.3: ใช้ detailsText ที่เตรียมไว้**
                   "type": "text",
-                  "text": detailsText,
+                  "text": keynumber2IdInput.value || '-',
                   "size": "xs",
                   "color": "#111111",
                   "align": "end",
@@ -575,12 +555,8 @@ function validateForm() {
     const nameId = nameIdInput.value.trim();
     const keynumberId = keynumberIdInput.value.trim();
     const keynumber3Id = keynumber3IdInput.value.trim();
-
-    // **แก้ไข 4: เพิ่มการตรวจสอบเบอร์โทรศัพท์ใน validateForm**
-    const keynumberVal = keynumberIdInput.value.trim();
-    const isPhoneValid = /^0\d{9}$/.test(keynumberVal);
     
-    if (userlineId === '' || nameId === '' || keynumberId === '' || keynumber3Id === '' || !isPhoneValid) {
+    if (userlineId === '' || nameId === '' || keynumberId === '' || keynumber3Id === '' ) {
         return false;
     }
     return true;
@@ -603,7 +579,7 @@ async function showConfirmationDialog() {
 submitBtn.addEventListener('click', async (event) => {
     event.preventDefault();
 
-    // 1. ตรวจสอบ Input ทั่วไป
+    // 1. ตรวจสอบ Input ทั่วไป (ชื่อ, เบอร์, ทะเบียนผู้ใช้น้ำ)
     if (!validateForm()) {
         Swal.fire({
             icon: 'warning',
@@ -613,9 +589,10 @@ submitBtn.addEventListener('click', async (event) => {
         return;
     }
 
-    // 2. ตรวจสอบเงื่อนไข Checkbox
+    // 2. ตรวจสอบเงื่อนไข Checkbox (Auto-select ทำให้กรณี e-Tax only แทบไม่เกิด แต่เช็คไว้กันพลาด)
     const isEBillChecked = keynumber4IdInput.checked;
 
+    // เงื่อนไขบังคับ: ต้องเลือก e-Bill เสมอ
     if (!isEBillChecked) {
         Swal.fire({
             icon: 'warning',
@@ -625,19 +602,36 @@ submitBtn.addEventListener('click', async (event) => {
         return;
     }    
 
-    // REMOVED: ลบส่วนตรวจสอบ keynumber3Id แบบตัวเลข 8 หลักออก
-    // เพราะตอนนี้เป็น Dropdown ข้อความแล้ว    
+    const keynumber3Val = keynumber3IdInput.value.trim();
+    if (!/^\d{8}$/.test(keynumber3Val)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'ข้อมูลไม่ถูกต้อง',
+            text: 'กรุณากรอกทะเบียนผู้ใช้น้ำเป็นตัวเลข 8 หลักเท่านั้น',
+        });
+        return;
+    }
+
+    const keynumberVal = keynumberIdInput.value.trim();
+    if (!/^0\d{9}$/.test(keynumberVal)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'เบอร์โทรศัพท์ไม่ถูกต้อง',
+            text: 'กรุณากรอกเบอร์โทรศัพท์ 10 หลัก ให้ถูกต้อง (ตัวเลขเท่านั้นและขึ้นต้นด้วย 0)',
+        });
+        return;
+    }
     
     const isConfirmed = await showConfirmationDialog();
 
     if (isConfirmed) {
         submitBtn.disabled = true;
         loadingText.innerText = "กำลังบันทึกข้อมูล...";
-        loadingOverlay.style.display = 'flex';       
+        loadingOverlay.style.display = 'flex';      
 
         try {
-            let obj;              
-            if (fileInput.files.length > 0) {                
+            let obj;             
+            if (fileInput.files.length > 0) {               
                 let file = fileInput.files[0];
                 let base64 = await getBase64(file);
                 imgPreview.src = `data:${file.type};base64,${base64}`;
@@ -649,7 +643,6 @@ submitBtn.addEventListener('click', async (event) => {
                     userlineId: userlineIdInput.value,
                     nameId: nameIdInput.value,
                     keynumberId: keynumberIdInput.value,
-                    keynumber2Id: keynumber2IdInput.value, // <--- เพิ่ม
                     keynumber3Id: keynumber3IdInput.value,
                     keynumber4Id: keynumber4IdInput.checked,
                     keynumber5Id: keynumber5IdInput.checked
