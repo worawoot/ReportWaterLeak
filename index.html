@@ -95,8 +95,14 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="keynumber3Id" class="block text-sm font-semibold text-gray-700 mb-2">ทะเบียนผู้ใช้น้ำ <span style="color: #f90202">*</span></label>                    
-                    <input type="text" class="input-field w-full border border-blue-300 p-2 text-md rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="keynumber3Id" placeholder="กรอกทะเบียนผู้ใช้น้ำ 8 หลัก" name="keynumber3Id" required>
+                    <label for="keynumber3Id" class="block text-sm font-semibold text-gray-700 mb-2">หัวข้อ <span style="color: #f90202">*</span></label>
+                    <select id="keynumber3Id" name="keynumber3Id" required
+                        class="input-field w-full border border-blue-300 p-2 text-md rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="" disabled selected>กรุณาเลือกหัวข้อปัญหา</option>
+                        <option value="ท่อประปาแตกรั่ว">1. ท่อประปาแตกรั่ว</option>
+                        <option value="น้ำไม่ไหล/ไหลอ่อน">2. น้ำไม่ไหล/ไหลอ่อน</option>
+                        <option value="น้ำขุ่น/มีกลิ่น">3. น้ำขุ่น/มีกลิ่น</option>
+                    </select>
                 </div>
                     
                 <div class="mb-4">
@@ -341,7 +347,7 @@ async function sendFlexMessage() {
               "contents": [
                 {
                   "type": "text",
-                  "text": "ทะเบียนผู้ใช้น้ำ",
+                  "text": "หัวข้อที่แจ้ง",
                   "size": "sm",
                   "color": "#555555",
                   "flex": 2
@@ -618,8 +624,19 @@ submitBtn.addEventListener('click', async (event) => {
             text: 'กรุณาเลือกสมัครรับใบแจ้งค่าน้ำประปา (e-Bill) เป็นอย่างน้อย',
         });
         return;
-    }    
+    }  
 
+    // 3.ตรวจสอบว่ามีการเลือกหัวข้อแล้ว (เพิ่ม/แทนที่ส่วนนี้)
+    const keynumber3Val = keynumber3IdInput.value.trim();
+    if (keynumber3Val === '') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'ข้อมูลไม่ถูกต้อง',
+            text: 'กรุณาเลือกหัวข้อปัญหาที่ต้องการแจ้ง',
+        });
+        return;
+    }
+/*
     const keynumber3Val = keynumber3IdInput.value.trim();
     if (!/^\d{8}$/.test(keynumber3Val)) {
         Swal.fire({
@@ -629,7 +646,7 @@ submitBtn.addEventListener('click', async (event) => {
         });
         return;
     }
-
+*/
     const keynumberVal = keynumberIdInput.value.trim();
     if (!/^0\d{9}$/.test(keynumberVal)) {
         Swal.fire({
