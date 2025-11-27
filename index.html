@@ -198,11 +198,12 @@ async function getUserProfile() {
         if (profile.displayName) {
             document.getElementById('displayName').innerText = profile.displayName;
         }
-
+/*
         if (profile.pictureUrl) {
             currentProfileImage = profile.pictureUrl;
             imgPreview.src = currentProfileImage;
         }
+*/
     } catch (error) {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error);
     } finally {
