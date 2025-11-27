@@ -151,7 +151,6 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz9oiEei5V9ZYvcVPgz
 const LIFF_ID = '1657790891-40VQpd6O';
 
 const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
-//const DEFAULT_AVATAR = "https://drive.google.com/thumbnail?id=17Ejxsa6GFTFrpoKFkoXna-KudkgmPwHW";
 
 let url = `${WEB_APP_URL}`;
 let fileInput = document.getElementById("file");
@@ -173,6 +172,8 @@ let currentProfileImage = DEFAULT_AVATAR;
 window.onload = function () {
     loadingText.innerText = "กำลังโหลดข้อมูลสมาชิก...";
     loadingOverlay.style.display = 'flex';
+    // ตั้งค่ารูปภาพตัวอย่างให้เป็นภาพว่างตอนโหลดครั้งแรก (เพื่อ override ภาพจาก Google Drive ใน HTML)
+    imgPreview.src = DEFAULT_AVATAR;
     initializeLiff();
 };
 
@@ -560,7 +561,7 @@ function previewImage() {
         };
         reader.readAsDataURL(file);
     } else {
-        imgPreview.src = currentProfileImage;
+        imgPreview.src = DEFAULT_AVATAR; // ถ้าไม่มีไฟล์ที่เลือก ให้ใช้ภาพว่าง
     }
 }
 
@@ -573,6 +574,11 @@ function validateForm() {
     const nameId = nameIdInput.value.trim();
     const keynumberId = keynumberIdInput.value.trim();
     const keynumber3Id = keynumber3IdInput.value.trim();
+
+    // ตรวจสอบว่ามีการเลือกไฟล์รูปภาพแล้วหรือไม่
+    if (fileInput.files.length === 0) {
+        return { valid: false, message: 'กรุณาอัปโหลดรูปภาพปัญหาด้วยการแตะที่ไอคอนกล้อง' };
+    }
     
     if (userlineId === '' || nameId === '' || keynumberId === '' || keynumber3Id === '' ) {
         return false;
@@ -597,12 +603,13 @@ async function showConfirmationDialog() {
 submitBtn.addEventListener('click', async (event) => {
     event.preventDefault();
 
-    // 1. ตรวจสอบ Input ทั่วไป (ชื่อ, เบอร์, ทะเบียนผู้ใช้น้ำ)
-    if (!validateForm()) {
+    // 1. ตรวจสอบ Input ทั่วไป และ **รูปภาพ**
+    const validationResult = validateForm();
+    if (!validationResult.valid) {
         Swal.fire({
             icon: 'warning',
             title: 'ข้อมูลไม่ครบถ้วน',
-            text: 'กรุณากรอกข้อมูลในช่องที่มีเครื่องหมาย * ให้ครบ',
+            text: validationResult.message,
         });
         return;
     }
@@ -649,70 +656,30 @@ submitBtn.addEventListener('click', async (event) => {
 
         try {
             let obj;             
-            if (fileInput.files.length > 0) {               
-                let file = fileInput.files[0];
-                let base64 = await getBase64(file);
-                imgPreview.src = `data:${file.type};base64,${base64}`;
+            // **ส่วนนี้เรารับประกันแล้วว่ามีไฟล์ เพราะมีการตรวจสอบใน validateForm**
+            let file = fileInput.files[0];
+            let base64 = await getBase64(file);
+            imgPreview.src = `data:${file.type};base64,${base64}`; // อัปเดตพรีวิวด้วย Base64 ที่สร้างขึ้น
 
-                obj = {
-                    base64: base64,
-                    type: file.type,
-                    name: file.name,
-                    userlineId: userlineIdInput.value,
-                    nameId: nameIdInput.value,
-                    keynumberId: keynumberIdInput.value,
-                    keynumber3Id: keynumber3IdInput.value,
-                    keynumber4Id: keynumber4IdInput.checked,
-                    keynumber5Id: keynumber5IdInput.checked
-                };
-            } else {
-                let imageUrlToFetch = currentProfileImage;
-                let imageName = "Profile.jpg";
-                
-                try {
-                    let response = await fetch(imageUrlToFetch);
-                    let blob = await response.blob();
-                    let base64 = await getBase64(blob);
-                    
-                    obj = {
-                        base64: base64,
-                        type: blob.type,
-                        name: imageName,
-                        userlineId: userlineIdInput.value,
-                        nameId: nameIdInput.value,
-                        keynumberId: keynumberIdInput.value,
-                        keynumber2Id: keynumber2IdInput.value,
-                        keynumber3Id: keynumber3IdInput.value,
-                        keynumber4Id: keynumber4IdInput.checked,
-                        keynumber5Id: keynumber5IdInput.checked
-                    };
-                } catch (corsError) {
-                    console.warn("Cannot fetch Profile Image due to CORS, using Default Avatar instead.");
-                    let response = await fetch(DEFAULT_AVATAR);
-                    let blob = await response.blob();
-                    let base64 = await getBase64(blob);
-
-                    obj = {
-                        base64: base64,
-                        type: "image/png",
-                        name: "Avatar.png",
-                        userlineId: userlineIdInput.value,
-                        nameId: nameIdInput.value,
-                        keynumberId: keynumberIdInput.value,
-                        keynumber2Id: keynumber2IdInput.value,
-                        keynumber3Id: keynumber3IdInput.value,
-                        keynumber4Id: keynumber4IdInput.checked,
-                        keynumber5Id: keynumber5IdInput.checked
-                    };
-                }
-            }
-
+            obj = {
+                base64: base64,
+                type: file.type,
+                name: file.name,
+                userlineId: userlineIdInput.value,
+                nameId: nameIdInput.value,
+                keynumberId: keynumberIdInput.value,
+                keynumber2Id: keynumber2IdInput.value, // รวม keynumber2Id (Email) เข้ามาใน obj ที่ส่งไป
+                keynumber3Id: keynumber3IdInput.value,
+                keynumber4Id: keynumber4IdInput.checked,
+                keynumber5Id: keynumber5IdInput.checked
+            };
+            
             let response = await fetch(url, {
                 method: "POST",
                 body: JSON.stringify(obj)
             });
 
-            await response.text(); 
+            await response.text();  
             await sendFlexMessage();
 
             loadingOverlay.style.display = 'none';  
