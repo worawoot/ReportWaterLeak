@@ -122,7 +122,8 @@
                         class="input-field w-full border border-blue-300 p-2 text-md rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                         id="keynumber2Id" 
                         name="keynumber2Id" 
-                        rows="4" 
+                        rows="4"
+                        required
                         placeholder="ระบุจุดสังเกต หรือรายละเอียดปัญหาเพิ่มเติม"></textarea>
                 </div>
 
@@ -585,8 +586,10 @@ function validateForm() {
     const nameId = nameIdInput.value.trim();
     const keynumberId = keynumberIdInput.value.trim();
     const keynumber3Id = keynumber3IdInput.value.trim();
-    
-    if (userlineId === '' || nameId === '' || keynumberId === '' || keynumber3Id === '' ) {
+    const keynumber2Id = keynumber2IdInput.value.trim(); // รับค่ารายละเอียดเพิ่มเติม
+
+    // เพิ่มเงื่อนไข keynumber2Id ต้องไม่เป็นค่าว่าง
+    if (userlineId === '' || nameId === '' || keynumberId === '' || keynumber3Id === '' || keynumber2Id === '') {
         return false;
     }
     return true;
