@@ -182,12 +182,6 @@ async function getUserProfile() {
         if (profile.displayName) {
             document.getElementById('displayName').innerText = profile.displayName;
         }
-/*
-        if (profile.pictureUrl) {
-            currentProfileImage = profile.pictureUrl;
-            imgPreview.src = currentProfileImage;
-        }
-*/
     } catch (error) {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error);
     } finally {
@@ -521,17 +515,7 @@ submitBtn.addEventListener('click', async (event) => {
         });
         return;
     }
-/*
-    const keynumber3Val = keynumber3IdInput.value.trim();
-    if (!/^\d{8}$/.test(keynumber3Val)) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'ข้อมูลไม่ถูกต้อง',
-            text: 'กรุณากรอกทะเบียนผู้ใช้น้ำเป็นตัวเลข 8 หลักเท่านั้น',
-        });
-        return;
-    }
-*/
+
     const keynumberVal = keynumberIdInput.value.trim();
     if (!/^0\d{9}$/.test(keynumberVal)) {
         Swal.fire({
