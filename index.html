@@ -95,7 +95,7 @@
                     <!-- Map Container -->
                     <div id="map" class="rounded-lg shadow-sm border border-gray-300 mb-3"></div>
                     
-                    <button type="button" onclick="getLocation()" class="bg-white text-blue-600 hover:bg-blue-50 border border-blue-200 w-full py-2 rounded-lg text-sm font-bold flex items-center justify-center transition shadow-sm mb-2">
+                    <button type="button" onclick="getLocation(false)" class="bg-white text-blue-600 hover:bg-blue-50 border border-blue-200 w-full py-2 rounded-lg text-sm font-bold flex items-center justify-center transition shadow-sm mb-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                         </svg>
@@ -192,13 +192,16 @@ window.onload = function () {
     loadingText.innerText = "กำลังโหลด...";
     loadingOverlay.style.display = 'flex';
     
-    initializeMap(); // เริ่มต้นแผนที่
+    initializeMap(); 
     initializeLiff();
+    
+    // Auto call location on load (Silent Mode)
+    // ส่ง parameter true เพื่อบอกว่าเป็น Auto Mode (ไม่ต้องโชว์ Popup Loading/Success)
+    getLocation(true); 
 };
 
 // --- MAP FUNCTIONS ---
 function initializeMap() {
-    // พิกัดเริ่มต้น (กทม.)
     const defaultLat = 13.7563;
     const defaultLng = 100.5018;
 
@@ -208,59 +211,67 @@ function initializeMap() {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // เพิ่มหมุดเริ่มต้น (draggable)
     marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
 
-    // Event: เมื่อลากหมุดเสร็จ ให้ปรับค่า input
     marker.on('dragend', function(e) {
         const position = marker.getLatLng();
         updateLocationInputs(position.lat, position.lng);
     });
 
-    // Event: คลิกบนแผนที่เพื่อย้ายหมุด
     map.on('click', function(e) {
         marker.setLatLng(e.latlng);
         updateLocationInputs(e.latlng.lat, e.latlng.lng);
     });
 }
 
-function getLocation() {
-    Swal.fire({
-        title: 'กำลังค้นหาตำแหน่ง...',
-        text: 'กรุณารอสักครู่',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
+// เพิ่ม Parameter isAuto เพื่อเช็คว่าเรียกจาก Auto Load หรือกดปุ่ม
+function getLocation(isAuto = false) {
+    if (!isAuto) {
+        Swal.fire({
+            title: 'กำลังค้นหาตำแหน่ง...',
+            text: 'กรุณารอสักครู่',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+    }
 
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        });
+        navigator.geolocation.getCurrentPosition(
+            (position) => showPosition(position, isAuto), 
+            (error) => showError(error, isAuto), 
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
     } else {
-        Swal.close();
-        Swal.fire('Error', 'เบราว์เซอร์ไม่รองรับ Geolocation', 'error');
+        if (!isAuto) {
+            Swal.close();
+            Swal.fire('Error', 'เบราว์เซอร์ไม่รองรับ Geolocation', 'error');
+        }
     }
 }
 
-function showPosition(position) {
-    Swal.close();
+function showPosition(position, isAuto) {
+    if (!isAuto) Swal.close();
+    
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
 
-    // อัปเดตแผนที่และหมุด
     map.setView([lat, lng], 17);
     marker.setLatLng([lat, lng]);
-    
     updateLocationInputs(lat, lng);
 
-    Swal.fire({
-        icon: 'success',
-        title: 'ระบุตำแหน่งสำเร็จ',
-        timer: 1500,
-        showConfirmButton: false
-    });
+    // แสดง Success เฉพาะตอนกดปุ่มเอง (ถ้า Auto ให้ขึ้นเงียบๆ)
+    if (!isAuto) {
+        Swal.fire({
+            icon: 'success',
+            title: 'ระบุตำแหน่งสำเร็จ',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    }
 }
 
 function updateLocationInputs(lat, lng) {
@@ -268,7 +279,9 @@ function updateLocationInputs(lat, lng) {
     longitudeInput.value = lng.toFixed(6);
 }
 
-function showError(error) {
+function showError(error, isAuto) {
+    if (isAuto) return; // ถ้า Auto Error ไม่ต้องแจ้งเตือน (ใช้ Default Map ไปก่อน)
+
     Swal.close();
     let msg = "ไม่สามารถระบุตำแหน่งได้";
     if (error.code === error.PERMISSION_DENIED) msg = "กรุณากด 'อนุญาต' ให้เข้าถึงตำแหน่ง";
@@ -287,7 +300,6 @@ async function initializeLiff() {
     } catch (err) {
         console.error('LIFF Init failed', err);
         loadingOverlay.style.display = 'none';
-        // ในกรณีเทสบนเว็บปกติ ไม่ต้อง Alert error LIFF
     }
 }
 
