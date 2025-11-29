@@ -319,118 +319,186 @@ async function sendFlexMessage() {
     let formattedPhone = keynumberIdInput.value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
 
     // --- Modern & Formal Flex Message ---
-    const flexMessage = {
-      "type": "flex",
-      "altText": "รับเรื่องแจ้งเหตุเรียบร้อย",
-      "contents": {
-        "type": "bubble",
-        "size": "giga",
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "paddingAll": "0px",
-          "contents": [
-            // --- Header Section (Official Blue) ---
-            {
-              "type": "box",
-              "layout": "vertical",
-              "backgroundColor": "#0056b3",
-              "paddingTop": "25px",
-              "paddingBottom": "25px",
-              "paddingStart": "20px",
-              "paddingEnd": "20px",
-              "contents": [
-                {
-                  "type": "text",
-                  "text": "รับแจ้งเหตุเรียบร้อย",
-                  "weight": "bold",
-                  "size": "xl",
-                  "color": "#ffffff"
-                },
-                {
-                  "type": "text",
-                  "text": "ระบบได้บันทึกข้อมูลของท่านแล้ว",
-                  "size": "sm",
-                  "color": "#e0e0e0",
-                  "margin": "xs"
-                }
-              ]
-            },
-            // --- Details Section ---
-            {
-              "type": "box",
-              "layout": "vertical",
-              "paddingAll": "20px",
-              "spacing": "md",
-              "contents": [
-                {
-                  "type": "text",
-                  "text": "รายละเอียดการแจ้ง",
-                  "weight": "bold",
-                  "color": "#333333",
-                  "size": "sm"
-                },
-                {
-                  "type": "separator",
-                  "color": "#eeeeee"
-                },
-                // Row 1
-                {
-                  "type": "box",
-                  "layout": "baseline",
-                  "contents": [
-                    { "type": "text", "text": "หัวข้อ", "color": "#aaaaaa", "size": "sm", "flex": 2 },
-                    { "type": "text", "text": keynumber3IdInput.value, "wrap": true, "color": "#333333", "size": "sm", "flex": 4 }
-                  ]
-                },
-                // Row 2
-                {
-                  "type": "box",
-                  "layout": "baseline",
-                  "contents": [
-                    { "type": "text", "text": "ผู้แจ้ง", "color": "#aaaaaa", "size": "sm", "flex": 2 },
-                    { "type": "text", "text": nameIdInput.value, "wrap": true, "color": "#333333", "size": "sm", "flex": 4 }
-                  ]
-                },
-                // Row 3
-                {
-                  "type": "box",
-                  "layout": "baseline",
-                  "contents": [
-                    { "type": "text", "text": "เบอร์โทร", "color": "#aaaaaa", "size": "sm", "flex": 2 },
-                    { "type": "text", "text": formattedPhone, "wrap": true, "color": "#333333", "size": "sm", "flex": 4 }
-                  ]
-                },
-                // Row 4
-                {
-                  "type": "box",
-                  "layout": "baseline",
-                  "contents": [
-                    { "type": "text", "text": "สถานที่", "color": "#aaaaaa", "size": "sm", "flex": 2 },
-                    { "type": "text", "text": keynumber2IdInput.value, "wrap": true, "color": "#333333", "size": "sm", "flex": 4 }
-                  ]
-                }
-              ]
-            },
-            // --- Footer Section ---
-            {
-              "type": "box",
-              "layout": "vertical",
-              "backgroundColor": "#f8f9fa",
-              "paddingAll": "15px",
-              "contents": [
-                {
-                  "type": "text",
-                  "text": "การประปานครหลวง (สาขาลาดพร้าว)",
-                  "size": "xs",
-                  "color": "#888888",
-                  "align": "center"
-                }
-              ]
-            }
-          ]
-        }
+    const flexMessage = 
+    {
+  "type": "bubble",
+  "size": "mega",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "paddingAll": "0px",
+    "contents": [
+      {
+        "type": "box",
+        "layout": "vertical",
+        "backgroundColor": "#0056b3",
+        "paddingTop": "25px",
+        "paddingBottom": "25px",
+        "paddingStart": "20px",
+        "paddingEnd": "20px",
+        "contents": [
+          {
+            "type": "text",
+            "text": "รับแจ้งเหตุเรียบร้อย",
+            "weight": "bold",
+            "size": "xl",
+            "color": "#ffffff"
+          },
+          {
+            "type": "text",
+            "text": "ระบบได้บันทึกข้อมูลของท่านแล้ว",
+            "size": "sm",
+            "color": "#e0e0e0",
+            "margin": "xs"
+          }
+        ]
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "paddingAll": "20px",
+        "spacing": "md",
+        "contents": [
+          {
+            "type": "text",
+            "text": "รายละเอียดการแจ้ง",
+            "weight": "bold",
+            "color": "#333333",
+            "size": "sm"
+          },
+          {
+            "type": "separator",
+            "color": "#888888"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "หัวข้อ",
+                "color": "#aaaaaa",
+                "size": "sm",
+                "flex": 2
+              },
+              {
+                "type": "text",
+                "text": keynumber3IdInput.value,
+                "wrap": true,
+                "color": "#333333",
+                "size": "sm",
+                "flex": 4
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "ผู้แจ้ง",
+                "color": "#aaaaaa",
+                "size": "sm",
+                "flex": 2
+              },
+              {
+                "type": "text",
+                "text": nameIdInput.value,
+                "wrap": true,
+                "color": "#333333",
+                "size": "sm",
+                "flex": 4
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "เบอร์โทร",
+                "color": "#aaaaaa",
+                "size": "sm",
+                "flex": 2
+              },
+              {
+                "type": "text",
+                "text": formattedPhone,
+                "wrap": true,
+                "color": "#333333",
+                "size": "sm",
+                "flex": 4
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "รายละเอียด",
+                "color": "#aaaaaa",
+                "size": "sm",
+                "flex": 2
+              },
+              {
+                "type": "text",
+                "text": keynumber2IdInput.value,
+                "wrap": true,
+                "color": "#333333",
+                "size": "sm",
+                "flex": 4
+              }
+            ]
+          },
+          {
+            "type": "separator",
+            "color": "#888888"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "สถานะ",
+                "color": "#aaaaaa",
+                "size": "sm",
+                "flex": 2
+              },
+              {
+                "type": "text",
+                "text": keynumber2IdInput.value,
+                "wrap": true,
+                "color": "#333333",
+                "size": "sm",
+                "flex": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "backgroundColor": "#f8f9fa",
+        "paddingAll": "15px",
+        "contents": [
+          {
+            "type": "text",
+            "text": "การประปานครหลวง (สาขาลาดพร้าว)",
+            "size": "xs",
+            "color": "#888888",
+            "align": "center"
+          }
+        ]
       }
+    ]
+  }
+}
     };
 
     try {
