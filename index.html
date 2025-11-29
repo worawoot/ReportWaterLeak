@@ -320,51 +320,238 @@ async function sendFlexMessage() {
 
     let formattedPhone = keynumberIdInput.value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
 
+    // ตรวจสอบสถานะการติ๊ก (ถ้าใช้ checkbox)
+    const isBill = keynumber4IdInput.checked;
+    const isTax = keynumber5IdInput.checked;
+
     const flexMessage = {
       "type": "flex",
-      "altText": "รับเรื่องแจ้งเหตุเรียบร้อย",
+      "altText": "ลงทะเบียนสำเร็จ: MWA แจ้งเหตุ",
       "contents": {
         "type": "bubble",
-        "size": "mega",
         "body": {
           "type": "box",
           "layout": "vertical",
+          "paddingAll": "0px",
           "contents": [
-            {
-              "type": "text",
-              "text": "รับแจ้งเหตุแล้ว",
-              "weight": "bold",
-              "size": "xl",
-              "color": "#1DB446",
-              "align": "center"
-            },
-            {
-              "type": "separator",
-              "margin": "md"
-            },
+            // --- HEADER ---
             {
               "type": "box",
               "layout": "vertical",
-              "margin": "md",
-              "spacing": "sm",
+              "backgroundColor": "#00B9F1", 
+              "paddingTop": "40px",
+              "paddingBottom": "30px",
+              "alignItems": "center",
               "contents": [
                 {
                   "type": "box",
-                  "layout": "baseline",
+                  "layout": "vertical",
+                  "cornerRadius": "30px",
+                  "width": "60px",
+                  "height": "60px",
+                  "backgroundColor": "#28C446",
+                  "justifyContent": "center",
+                  "alignItems": "center",
                   "contents": [
-                    { "type": "text", "text": "เรื่อง", "color": "#aaaaaa", "size": "sm", "flex": 1 },
-                    { "type": "text", "text": keynumber3IdInput.value, "wrap": true, "color": "#666666", "size": "sm", "flex": 3 }
+                     { "type": "text", "text": "✓", "color": "#ffffff", "size": "3xl", "weight": "bold" }
                   ]
                 },
+                {
+                  "type": "text",
+                  "text": "ลงทะเบียนสำเร็จ",
+                  "color": "#ffffff",
+                  "weight": "bold",
+                  "size": "xl",
+                  "margin": "md"
+                },
+                {
+                  "type": "text",
+                  "text": "ระบบได้รับข้อมูลของท่านแล้ว",
+                  "color": "#ffffff",
+                  "size": "sm",
+                  "margin": "sm",
+                  "alpha": 0.9
+                }
+              ]
+            },
+            // --- BODY ---
+            {
+              "type": "box",
+              "layout": "vertical",
+              "paddingAll": "20px",
+              "contents": [
+                // Logo Section
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "contents": [
+                    { 
+                        "type": "image", 
+                        "url": "https://firebasestorage.googleapis.com/v0/b/webapp-c8c38.appspot.com/o/th-full-white.png?alt=media&token=88a41cdb-27fd-4c98-8d11-a390ef103163", 
+                        "width": "40px", 
+                        "height": "40px",
+                        "flex": 0
+                    },
+                    { 
+                        "type": "text", 
+                        "text": "การประปานครหลวง (สาขาลาดพร้าว)", 
+                        "gravity": "center", 
+                        "size": "sm", 
+                        "color": "#888888", 
+                        "flex": 1, 
+                        "wrap": true, 
+                        "margin": "md",
+                        "weight": "bold"
+                    }
+                  ],
+                  "margin": "none"
+                },
+                { "type": "separator", "margin": "lg", "color": "#f0f0f0" },
+                
+                // Section 1: ข้อมูลผู้ลงทะเบียน
+                {
+                  "type": "text",
+                  "text": "ข้อมูลผู้ลงทะเบียน",
+                  "color": "#00B9F1",
+                  "weight": "bold",
+                  "size": "md",
+                  "margin": "lg"
+                },
+                // Row: หัวข้อที่แจ้ง
                 {
                   "type": "box",
                   "layout": "baseline",
                   "contents": [
-                    { "type": "text", "text": "สถานที่", "color": "#aaaaaa", "size": "sm", "flex": 1 },
-                    { "type": "text", "text": keynumber2IdInput.value, "wrap": true, "color": "#666666", "size": "sm", "flex": 3 }
-                  ]
+                    { "type": "text", "text": "หัวข้อที่แจ้ง", "color": "#555555", "size": "sm", "flex": 2 },
+                    { "type": "text", "text": keynumber3IdInput.value, "wrap": true, "color": "#111111", "size": "sm", "flex": 3, "align": "end", "weight": "bold" }
+                  ],
+                  "margin": "md"
+                },
+                // Row: ชื่อ-สกุล
+                {
+                  "type": "box",
+                  "layout": "baseline",
+                  "contents": [
+                    { "type": "text", "text": "ชื่อ-สกุล", "color": "#555555", "size": "sm", "flex": 2 },
+                    { "type": "text", "text": nameIdInput.value, "wrap": true, "color": "#111111", "size": "sm", "flex": 3, "align": "end", "weight": "bold" }
+                  ],
+                  "margin": "sm"
+                },
+                // Row: เบอร์โทร
+                {
+                  "type": "box",
+                  "layout": "baseline",
+                  "contents": [
+                    { "type": "text", "text": "เบอร์โทรศัพท์", "color": "#555555", "size": "sm", "flex": 2 },
+                    { "type": "text", "text": formattedPhone, "wrap": true, "color": "#111111", "size": "sm", "flex": 3, "align": "end", "weight": "bold" }
+                  ],
+                  "margin": "sm"
+                },
+                // Row: รายละเอียด (ตัดคำ)
+                {
+                  "type": "box",
+                  "layout": "baseline",
+                  "contents": [
+                    { "type": "text", "text": "รายละเอียด", "color": "#555555", "size": "sm", "flex": 2 },
+                    { 
+                        "type": "text", 
+                        "text": keynumber2IdInput.value.length > 20 ? keynumber2IdInput.value.substring(0, 18) + "..." : keynumber2IdInput.value, 
+                        "wrap": true, 
+                        "color": "#111111", 
+                        "size": "sm", 
+                        "flex": 3, 
+                        "align": "end", 
+                        "weight": "bold" 
+                    }
+                  ],
+                  "margin": "sm"
+                },
+
+                { "type": "separator", "margin": "lg", "color": "#f0f0f0" },
+
+                // Section 2: สถานะการสมัคร (e-Bill / e-Tax)
+                {
+                  "type": "text",
+                  "text": "สถานะการสมัคร",
+                  "color": "#00B9F1",
+                  "weight": "bold",
+                  "size": "md",
+                  "margin": "lg"
+                },
+                // MWA e-Bill
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "contents": [
+                    { "type": "text", "text": "MWA e-Bill", "size": "sm", "color": "#555555", "gravity": "center", "flex": 3 },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "backgroundColor": isBill ? "#E6F9EA" : "#F5F5F5",
+                        "cornerRadius": "md",
+                        "paddingAll": "xs",
+                        "contents": [
+                            { 
+                                "type": "text", 
+                                "text": isBill ? "สมัครใช้บริการ" : "ไม่สมัคร", 
+                                "color": isBill ? "#28C446" : "#AAAAAA", 
+                                "size": "xs", 
+                                "align": "center", 
+                                "weight": "bold" 
+                            }
+                        ],
+                        "flex": 2
+                    }
+                  ],
+                  "margin": "md",
+                  "alignItems": "center"
+                },
+                // e-Tax Invoice
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "contents": [
+                    { "type": "text", "text": "e-Tax Invoice", "size": "sm", "color": "#555555", "gravity": "center", "flex": 3 },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "backgroundColor": isTax ? "#E6F9EA" : "#F5F5F5",
+                        "cornerRadius": "md",
+                        "paddingAll": "xs",
+                        "contents": [
+                            { 
+                                "type": "text", 
+                                "text": isTax ? "สมัครใช้บริการ" : "ไม่สมัคร", 
+                                "color": isTax ? "#28C446" : "#AAAAAA", 
+                                "size": "xs", 
+                                "align": "center", 
+                                "weight": "bold" 
+                            }
+                        ],
+                        "flex": 2
+                    }
+                  ],
+                  "margin": "md",
+                  "alignItems": "center"
                 }
+
               ]
+            },
+            // --- FOOTER ---
+            {
+                "type": "box",
+                "layout": "vertical",
+                "backgroundColor": "#f8f8f8",
+                "paddingAll": "15px",
+                "contents": [
+                    { 
+                        "type": "text", 
+                        "text": "ขอบคุณที่ใช้บริการ MWA", 
+                        "align": "center", 
+                        "color": "#aaaaaa", 
+                        "size": "xs" 
+                    }
+                ]
             }
           ]
         }
@@ -373,7 +560,7 @@ async function sendFlexMessage() {
 
     try {
         await liff.sendMessages([flexMessage]);
-    } catch (error) { console.error(error); }
+    } catch (error) { console.error("Send Msg Error:", error); }
 }
 
 function getBase64(file) {
