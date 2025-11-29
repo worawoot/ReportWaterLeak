@@ -224,7 +224,6 @@ function initializeMap() {
     });
 }
 
-// เพิ่ม Parameter isAuto เพื่อเช็คว่าเรียกจาก Auto Load หรือกดปุ่ม
 function getLocation(isAuto = false) {
     if (!isAuto) {
         Swal.fire({
@@ -263,7 +262,6 @@ function showPosition(position, isAuto) {
     marker.setLatLng([lat, lng]);
     updateLocationInputs(lat, lng);
 
-    // แสดง Success เฉพาะตอนกดปุ่มเอง (ถ้า Auto ให้ขึ้นเงียบๆ)
     if (!isAuto) {
         Swal.fire({
             icon: 'success',
@@ -280,7 +278,7 @@ function updateLocationInputs(lat, lng) {
 }
 
 function showError(error, isAuto) {
-    if (isAuto) return; // ถ้า Auto Error ไม่ต้องแจ้งเตือน (ใช้ Default Map ไปก่อน)
+    if (isAuto) return; 
 
     Swal.close();
     let msg = "ไม่สามารถระบุตำแหน่งได้";
@@ -320,6 +318,7 @@ async function sendFlexMessage() {
 
     let formattedPhone = keynumberIdInput.value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
 
+    // กลับมาใช้ Flex Message แบบเรียบง่าย (ก่อนหน้าปรับปรุง)
     const flexMessage = {
       "type": "flex",
       "altText": "รับเรื่องแจ้งเหตุเรียบร้อย",
