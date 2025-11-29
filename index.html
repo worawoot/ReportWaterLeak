@@ -71,7 +71,7 @@
                     <img src="https://drive.google.com/thumbnail?id=17Ejxsa6GFTFrpoKFkoXna-KudkgmPwHW" 
                          alt="Problem Image" 
                          id="preview" 
-                         class="w-full h-56 object-cover rounded-2xl border-4 border-white shadow-lg mx-auto bg-slate-50">                        
+                         class="w-full h-56 object-cover rounded-2xl border-4 border-white shadow-lg mx-auto bg-slate-50">                       
                     
                     <label for="file" class="absolute -bottom-2 -right-2 bg-white p-2.5 rounded-full shadow-md cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 border border-slate-200 active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -85,7 +85,7 @@
                 <p class="text-xs text-slate-400 mt-1">แตะไอคอนกล้องเพื่อถ่ายรูปจุดเกิดเหตุ <span class="text-red-500">*</span></p>
             </div>
             
-            <div class="flex flex-col space-y-4">            
+            <div class="flex flex-col space-y-4">              
                 <input type="text" class="hidden" id="userlineId" name="userlineId" readonly>
 
                 <!-- MAP SECTION -->
@@ -159,7 +159,7 @@
             <footer class="text-center text-xs text-gray-400 mt-6 font-light">
                 MWA Reporting System © 2025
             </footer>
-        </div>          
+        </div>           
     </form>
 </div>
 
@@ -168,6 +168,10 @@
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz9oiEei5V9ZYvcVPgzq_v1WWafS0YOclXh21MXlDZqsGQ0_WDrwxJq9YlEhvblZCr1RQ/exec'; 
 const LIFF_ID = '1657790891-40VQpd6O';
 const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
+
+// ตัวแปรสำหรับรูปที่จะโชว์ใน Flex (ต้องเป็น HTTPS URL เท่านั้น ไม่รองรับ Base64)
+// หาก Server ของคุณ return URL รูปกลับมา ให้เอาค่ามาใส่แทนที่ลิงก์นี้
+const HERO_IMAGE_URL = 'https://cdn.pixabay.com/photo/2014/06/04/16/36/manhole-cover-362150_960_720.jpg';
 
 let fileInput = document.getElementById("file");
 let imgPreview = document.getElementById("preview");
@@ -196,7 +200,6 @@ window.onload = function () {
     initializeLiff();
     
     // Auto call location on load (Silent Mode)
-    // ส่ง parameter true เพื่อบอกว่าเป็น Auto Mode (ไม่ต้องโชว์ Popup Loading/Success)
     getLocation(true); 
 };
 
@@ -313,210 +316,215 @@ async function getUserProfile() {
     }
 }
 
+// --- UPDATED FLEX MESSAGE FUNCTION ---
 async function sendFlexMessage() {
     if (!liff.isInClient()) return;
 
     let formattedPhone = keynumberIdInput.value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+    let lat = latitudeInput.value;
+    let long = longitudeInput.value;
+    let mapLink = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
+    let currentDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit'});
 
-    // --- Modern & Formal Flex Message ---
     const flexMessage = {
-      "type": "flex",
-      "altText": "รับเรื่องแจ้งเหตุเรียบร้อย",
-      "contents": 
-      {
-  "type": "bubble",
-  "size": "mega",
-  "body": {
-    "type": "box",
-    "layout": "vertical",
-    "paddingAll": "0px",
-    "contents": [
-      {
-        "type": "box",
-        "layout": "vertical",
-        "backgroundColor": "#0056b3",
-        "paddingTop": "25px",
-        "paddingBottom": "25px",
-        "paddingStart": "20px",
-        "paddingEnd": "20px",
-        "alignItems": "center",
-        "contents": [
-          {
-            "type": "image",
-            "url": "https://firebasestorage.googleapis.com/v0/b/webapp-c8c38.appspot.com/o/th-full-white.png?alt=media&token=88a41cdb-27fd-4c98-8d11-a390ef103163",
-            "size": "xs",
-            "aspectMode": "fit",
-            "margin": "sm"
-          },
-          {
-            "type": "text",
-            "text": "รับแจ้งเหตุเรียบร้อย",
-            "weight": "bold",
-            "size": "xl",
-            "color": "#ffffff",
-            "margin": "md"
-          },
-          {
-            "type": "text",
-            "text": "ระบบได้บันทึกข้อมูลของท่านแล้ว",
-            "size": "sm",
-            "color": "#e0e0e0",
-            "margin": "xs"
-          }
-        ]
-      },
-      {
-        "type": "box",
-        "layout": "vertical",
-        "paddingAll": "20px",
-        "spacing": "md",
-        "contents": [
-          {
-            "type": "text",
-            "text": "รายละเอียดการแจ้ง",
-            "weight": "bold",
-            "color": "#333333",
-            "size": "sm"
-          },
-          {
-            "type": "separator",
-            "color": "#eeeeee"
-          },
-          {
-            "type": "box",
-            "layout": "baseline",
-            "contents": [
-              {
-                "type": "text",
-                "text": "หัวข้อ",
-                "color": "#aaaaaa",
-                "size": "sm",
-                "flex": 2
-              },
-              {
-                "type": "text",
-                "text": keynumber3IdInput.value,
-                "wrap": true,
-                "color": "#333333",
-                "size": "sm",
-                "flex": 4
-              }
-            ]
-          },
-          {
-            "type": "box",
-            "layout": "baseline",
-            "contents": [
-              {
-                "type": "text",
-                "text": "ผู้แจ้ง",
-                "color": "#aaaaaa",
-                "size": "sm",
-                "flex": 2
-              },
-              {
-                "type": "text",
-                "text": nameIdInput.value,
-                "wrap": true,
-                "color": "#333333",
-                "size": "sm",
-                "flex": 4
-              }
-            ]
-          },
-          {
-            "type": "box",
-            "layout": "baseline",
-            "contents": [
-              {
-                "type": "text",
-                "text": "เบอร์โทร",
-                "color": "#aaaaaa",
-                "size": "sm",
-                "flex": 2
-              },
-              {
-                "type": "text",
-                "text": formattedPhone,
-                "wrap": true,
-                "color": "#333333",
-                "size": "sm",
-                "flex": 4
-              }
-            ]
-          },
-          {
-            "type": "box",
-            "layout": "baseline",
-            "contents": [
-              {
-                "type": "text",
-                "text": "รายละเอียด",
-                "color": "#aaaaaa",
-                "size": "sm",
-                "flex": 2
-              },
-              {
-                "type": "text",
-                "text": keynumber2IdInput.value,
-                "wrap": true,
-                "color": "#333333",
-                "size": "sm",
-                "flex": 4
-              }
-            ]
-          },
-          {
-            "type": "separator",
-            "color": "#eeeeee"
-          },
-          {
-            "type": "box",
-            "layout": "baseline",
-            "contents": [
-              {
-                "type": "text",
-                "text": "สถานะ",
-                "color": "#aaaaaa",
-                "size": "sm",
-                "flex": 2
-              },
-              {
-                "type": "text",
-                "text": "รอดำเนินการ",
-                "wrap": true,
-                "color": "#f59e0b",
-                "size": "sm",
-                "flex": 4,
-                "weight": "bold"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type": "box",
-        "layout": "vertical",
-        "backgroundColor": "#f8f9fa",
-        "paddingAll": "15px",
-        "contents": [
-          {
-            "type": "text",
-            "text": "การประปานครหลวง (สาขาลาดพร้าว)",
-            "size": "xs",
-            "color": "#888888",
-            "align": "center"
-          }
-        ]
-      }
-    ]
-  }
-}
+        "type": "flex",
+        "altText": "แจ้งเหตุประปาขัดข้องสำเร็จ",
+        "contents": {
+            "type": "bubble",
+            "size": "giga",
+            "hero": {
+                "type": "image",
+                "url": HERO_IMAGE_URL, // ใช้ตัวแปร Global ด้านบน (หรือ URL จาก Response ถ้ามี)
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover",
+                "action": {
+                    "type": "uri",
+                    "uri": mapLink
+                }
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "รับแจ้งเหตุเรียบร้อย",
+                        "weight": "bold",
+                        "size": "xl",
+                        "color": "#0056b3"
+                    },
+                    {
+                        "type": "text",
+                        "text": `วันที่: ${currentDate}`,
+                        "size": "xs",
+                        "color": "#aaaaaa",
+                        "margin": "sm"
+                    },
+                    {
+                        "type": "separator",
+                        "margin": "lg"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "margin": "lg",
+                        "spacing": "sm",
+                        "contents": [
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "หัวข้อ",
+                                        "color": "#aaaaaa",
+                                        "size": "sm",
+                                        "flex": 2
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": keynumber3IdInput.value,
+                                        "wrap": true,
+                                        "color": "#666666",
+                                        "size": "sm",
+                                        "flex": 5,
+                                        "weight": "bold"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "ผู้แจ้ง",
+                                        "color": "#aaaaaa",
+                                        "size": "sm",
+                                        "flex": 2
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": nameIdInput.value,
+                                        "wrap": true,
+                                        "color": "#666666",
+                                        "size": "sm",
+                                        "flex": 5
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "เบอร์โทร",
+                                        "color": "#aaaaaa",
+                                        "size": "sm",
+                                        "flex": 2
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": formattedPhone,
+                                        "wrap": true,
+                                        "color": "#666666",
+                                        "size": "sm",
+                                        "flex": 5
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "พิกัด",
+                                        "color": "#aaaaaa",
+                                        "size": "sm",
+                                        "flex": 2
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": `${lat}, ${long}`,
+                                        "wrap": true,
+                                        "color": "#666666",
+                                        "size": "xs",
+                                        "flex": 5
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "margin": "lg",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "รายละเอียดเพิ่มเติม:",
+                                "size": "xs",
+                                "color": "#aaaaaa",
+                                "margin": "none"
+                            },
+                            {
+                                "type": "text",
+                                "text": keynumber2IdInput.value,
+                                "wrap": true,
+                                "color": "#333333",
+                                "size": "sm",
+                                "margin": "sm"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "sm",
+                "contents": [
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "height": "sm",
+                        "action": {
+                            "type": "uri",
+                            "label": "ดูตำแหน่งใน Google Map",
+                            "uri": mapLink
+                        },
+                        "color": "#0056b3"
+                    },
+                    {
+                        "type": "button",
+                        "style": "link",
+                        "height": "sm",
+                        "action": {
+                            "type": "uri",
+                            "label": "โทรสายด่วน 1125",
+                            "uri": "tel:1125"
+                        }
+                    },
+                    {
+                        "type": "spacer",
+                        "size": "sm"
+                    }
+                ],
+                "flex": 0
+            }
+        }
     };
 
     try {
         await liff.sendMessages([flexMessage]);
-    } catch (error) { console.error(error); }
+    } catch (error) { console.error("LIFF Send Error:", error); }
 }
 
 function getBase64(file) {
@@ -568,7 +576,7 @@ submitBtn.addEventListener('click', async (event) => {
     if (isConfirmed.isConfirmed) {
         submitBtn.disabled = true;
         loadingText.innerText = "กำลังส่งข้อมูล...";
-        loadingOverlay.style.display = 'flex';      
+        loadingOverlay.style.display = 'flex';       
 
         try {
             let base64 = "";
@@ -597,14 +605,22 @@ submitBtn.addEventListener('click', async (event) => {
                 type: fileType
             };
 
+            // Call Web App
             await fetch(WEB_APP_URL, {
                 method: "POST",
                 body: JSON.stringify(obj)
             });
 
-            await sendFlexMessage();
-            loadingOverlay.style.display = 'none';
+            // *** หมายเหตุ: ถ้า Google Script ของคุณ return JSON กลับมาพร้อม URL รูปภาพ
+            // ให้รับค่า response ตรงนี้แล้วส่งไปที่ sendFlexMessage(imageUrl) ได้เลย
+            // ตัวอย่าง:
+            // const response = await fetch(...);
+            // const data = await response.json();
+            // HERO_IMAGE_URL = data.imageUrl; // อัปเดตตัวแปรรูปภาพ
 
+            await sendFlexMessage();
+            
+            loadingOverlay.style.display = 'none';
             await Swal.fire('สำเร็จ', 'ส่งข้อมูลเรียบร้อยแล้ว', 'success');
             liff.closeWindow();
 
