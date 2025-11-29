@@ -169,9 +169,8 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz9oiEei5V9ZYvcVPgz
 const LIFF_ID = '1657790891-40VQpd6O';
 const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
 
-// ตัวแปรสำหรับรูปที่จะโชว์ใน Flex (ต้องเป็น HTTPS URL เท่านั้น ไม่รองรับ Base64)
-// หาก Server ของคุณ return URL รูปกลับมา ให้เอาค่ามาใส่แทนที่ลิงก์นี้
-const HERO_IMAGE_URL = 'https://cdn.pixabay.com/photo/2014/06/04/16/36/manhole-cover-362150_960_720.jpg';
+// รูปภาพสำรอง (Fallback) กรณีอัพโหลดไม่สำเร็จ หรือ Server ไม่ส่ง URL กลับมา
+const DEFAULT_HERO_IMAGE = 'https://cdn.pixabay.com/photo/2014/06/04/16/36/manhole-cover-362150_960_720.jpg';
 
 let fileInput = document.getElementById("file");
 let imgPreview = document.getElementById("preview");
@@ -317,7 +316,8 @@ async function getUserProfile() {
 }
 
 // --- UPDATED FLEX MESSAGE FUNCTION ---
-async function sendFlexMessage() {
+// เพิ่ม parameter uploadedImageUrl เพื่อรับ URL จากการตอบกลับของ Server
+async function sendFlexMessage(uploadedImageUrl) {
     if (!liff.isInClient()) return;
 
     let formattedPhone = keynumberIdInput.value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
@@ -326,15 +326,18 @@ async function sendFlexMessage() {
     let mapLink = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
     let currentDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit'});
 
+    // ใช้ URL ที่ได้จากการอัปโหลด หรือใช้รูป Default ถ้าไม่มี
+    let displayImage = uploadedImageUrl || DEFAULT_HERO_IMAGE;
+
     const flexMessage = {
         "type": "flex",
         "altText": "แจ้งเหตุประปาขัดข้องสำเร็จ",
         "contents": {
             "type": "bubble",
-            "size": "mega",
+            "size": "giga",
             "hero": {
                 "type": "image",
-                "url": HERO_IMAGE_URL, // ใช้ตัวแปร Global ด้านบน (หรือ URL จาก Response ถ้ามี)
+                "url": displayImage, // ใช้ URL รูปภาพที่ได้จาก Server
                 "size": "full",
                 "aspectRatio": "20:13",
                 "aspectMode": "cover",
@@ -605,20 +608,21 @@ submitBtn.addEventListener('click', async (event) => {
                 type: fileType
             };
 
-            // Call Web App
-            await fetch(WEB_APP_URL, {
+            // Call Web App และรอรับ JSON ตอบกลับ
+            const response = await fetch(WEB_APP_URL, {
                 method: "POST",
                 body: JSON.stringify(obj)
             });
 
-            // *** หมายเหตุ: ถ้า Google Script ของคุณ return JSON กลับมาพร้อม URL รูปภาพ
-            // ให้รับค่า response ตรงนี้แล้วส่งไปที่ sendFlexMessage(imageUrl) ได้เลย
-            // ตัวอย่าง:
-            // const response = await fetch(...);
-            // const data = await response.json();
-            // HERO_IMAGE_URL = data.imageUrl; // อัปเดตตัวแปรรูปภาพ
+            // *** ส่วนสำคัญ: รับค่า JSON จาก Google Apps Script เพื่อเอา URL รูปภาพ ***
+            // หมายเหตุ: ต้องแก้ GAS ให้ return ContentService.createTextOutput(JSON.stringify(output)).setMimeType(ContentService.MimeType.JSON);
+            const data = await response.json(); 
+            
+            // ส่ง URL รูปภาพที่ได้จาก Server ไปยัง Flex Message
+            // (สมมติว่า key ที่ส่งกลับมาชื่อ 'imageUrl' หรือ 'url')
+            let uploadedImageUrl = data.imageUrl || data.url || "";
 
-            await sendFlexMessage();
+            await sendFlexMessage(uploadedImageUrl);
             
             loadingOverlay.style.display = 'none';
             await Swal.fire('สำเร็จ', 'ส่งข้อมูลเรียบร้อยแล้ว', 'success');
