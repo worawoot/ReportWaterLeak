@@ -334,7 +334,7 @@ async function sendFlexMessage(uploadedImageUrl) {
         "altText": "แจ้งเหตุประปาขัดข้องสำเร็จ",
         "contents": {
             "type": "bubble",
-            "size": "giga",
+            "size": "mega",
             "hero": {
                 "type": "image",
                 "url": displayImage, // *** ใช้ตัวแปรนี้แทน ***
@@ -343,7 +343,8 @@ async function sendFlexMessage(uploadedImageUrl) {
                 "aspectMode": "cover",
                 "action": {
                     "type": "uri",
-                    "uri": mapLink
+                    //"uri": mapLink
+                    "url": displayImage // *** ใช้ตัวแปรนี้แทน ***
                 }
             },
             "body": {
