@@ -319,8 +319,11 @@ async function sendFlexMessage() {
     let formattedPhone = keynumberIdInput.value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
 
     // --- Modern & Formal Flex Message ---
-    const flexMessage = 
-    {
+    const flexMessage = {
+      "type": "flex",
+      "altText": "รับเรื่องแจ้งเหตุเรียบร้อย",
+      "contents": 
+      {
   "type": "bubble",
   "size": "mega",
   "body": {
