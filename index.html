@@ -334,17 +334,13 @@ async function sendFlexMessage(uploadedImageUrl) {
         "altText": "แจ้งเหตุประปาขัดข้องสำเร็จ",
         "contents": {
             "type": "bubble",
-            "size": "mega",
+            "size": "giga",
             "hero": {
                 "type": "image",
                 "url": displayImage, // *** ใช้ตัวแปรนี้แทน ***
                 "size": "full",
                 "aspectRatio": "20:13",
-                "aspectMode": "cover",
-                "action": {
-                    "type": "uri",
-                    "uri": mapLink                    
-                }
+                "aspectMode": "cover"                
             },
             "body": {
                 "type": "box",
@@ -511,7 +507,7 @@ async function sendFlexMessage(uploadedImageUrl) {
                         "height": "sm",
                         "action": {
                             "type": "uri",
-                            "label": "โทรสายด่วน 1125",
+                            "label": "ติดต่อเจ้าหน้าที่: โทรสายด่วน 1125",
                             "uri": "tel:1125"
                         }
                     },
