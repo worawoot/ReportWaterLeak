@@ -67,8 +67,11 @@
             
             <!-- Image Upload -->
             <div class="mb-5 text-center">
+                <!-- ตั้งค่ารูปภาพพรีวิวเริ่มต้นให้เป็นรูปที่สื่อถึงการรออัปโหลด หรือเป็นรูปภาพที่ต้องใช้ -->
                 <div class="relative mx-auto w-full h-56 mb-4 group">
-                    <img src="https://drive.google.com/thumbnail?id=17Ejxsa6GFTFrpoKFkoXna-KudkgmPwHW" 
+                    <!-- ให้ src เป็นค่าว่างหรือรูป placeholder ที่ชัดเจน เพื่อไม่ให้ซ้ำกับรูป Default (DEFAULT_HERO_IMAGE) ใน JS ถ้ายังไม่มีการเลือกไฟล์ -->
+                    <!-- เนื่องจากมีการบังคับให้ใส่รูป จึงเปลี่ยนรูป preview เริ่มต้นเป็น placeholder ที่สื่อว่าต้องมีการอัปโหลด -->
+                    <img src="https://placehold.co/500x325/e0e0e0/505050?text=CLICK+TO+UPLOAD+IMAGE" 
                          alt="Problem Image" 
                          id="preview" 
                          class="w-full h-56 object-cover rounded-2xl border-4 border-white shadow-lg mx-auto bg-slate-50">                       
@@ -82,7 +85,7 @@
                     </label>
                 </div>
                 <div id="displayName" class="text-xl text-slate-700 font-bold mt-2 hidden"></div>                    
-                <p class="text-xs text-slate-400 mt-1">แตะไอคอนกล้องเพื่อถ่ายรูปจุดเกิดเหตุ <span class="text-red-500">*</span></p>
+                <p class="text-xs text-slate-400 mt-1">แตะไอคอนกล้องเพื่อถ่ายรูปจุดเกิดเหตุ <span class="text-red-500">* (บังคับใส่รูป)</span></p>
             </div>
             
             <div class="flex flex-col space-y-4">              
@@ -166,11 +169,13 @@
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
+// URL ของ Google Apps Script Web App
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz9oiEei5V9ZYvcVPgzq_v1WWafS0YOclXh21MXlDZqsGQ0_WDrwxJq9YlEhvblZCr1RQ/exec'; 
+// LIFF ID ของคุณ
 const LIFF_ID = '1657790891-40VQpd6O';
 const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
 
-// รูป Default กรณีที่ไม่มีการอัปโหลดรูป หรือดึงรูปไม่สำเร็จ
+// รูป Default กรณีที่ไม่มีการอัปโหลดรูป (แต่ตอนนี้จะบังคับให้มีรูป)
 const DEFAULT_HERO_IMAGE = 'https://cdn.pixabay.com/photo/2014/06/04/16/36/manhole-cover-362150_960_720.jpg';
 
 let fileInput = document.getElementById("file");
@@ -205,6 +210,7 @@ window.onload = function () {
 
 // --- MAP FUNCTIONS ---
 function initializeMap() {
+    // กำหนดพิกัดเริ่มต้นเป็นกรุงเทพฯ (หรือจุดเริ่มต้นที่คุณต้องการ)
     const defaultLat = 13.7563;
     const defaultLng = 100.5018;
 
@@ -214,13 +220,16 @@ function initializeMap() {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
+    // สร้าง Marker ที่สามารถลากได้
     marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
 
+    // อัปเดตพิกัดเมื่อลาก Marker เสร็จ
     marker.on('dragend', function(e) {
         const position = marker.getLatLng();
         updateLocationInputs(position.lat, position.lng);
     });
 
+    // อัปเดตพิกัดเมื่อคลิกบนแผนที่
     map.on('click', function(e) {
         marker.setLatLng(e.latlng);
         updateLocationInputs(e.latlng.lat, e.latlng.lng);
@@ -261,6 +270,7 @@ function showPosition(position, isAuto) {
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
 
+    // ตั้งค่ามุมมองแผนที่และตำแหน่ง Marker
     map.setView([lat, lng], 17);
     marker.setLatLng([lat, lng]);
     updateLocationInputs(lat, lng);
@@ -327,7 +337,7 @@ async function sendFlexMessage(uploadedImageUrl) {
     let mapLink = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
     let currentDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit'});
 
-    // เลือกใช้รูปที่อัปโหลด ถ้าไม่มีให้ใช้รูป Default
+    // เลือกใช้รูปที่อัปโหลด (เนื่องจากมีการบังคับใส่รูป)
     let displayImage = uploadedImageUrl && uploadedImageUrl !== "" ? uploadedImageUrl : DEFAULT_HERO_IMAGE;
 
     const flexMessage = {
@@ -534,22 +544,33 @@ function getBase64(file) {
     });
 }
 
+// จัดการการแสดงรูปภาพพรีวิวเมื่อมีการเลือกไฟล์
 fileInput.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
         let file = fileInput.files[0];
         let reader = new FileReader();
+        // เปลี่ยนรูป placeholder เป็นรูปที่เลือก
         reader.onload = function(e) { imgPreview.src = e.target.result; };
         reader.readAsDataURL(file);
     }
 });
 
 function validateForm() {
-    if (!userlineIdInput.value || !nameIdInput.value || !keynumberIdInput.value || !keynumber3IdInput.value || !keynumber2IdInput.value) {
-        return { valid: false, msg: 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบ' };
+    // 1. ตรวจสอบว่ามีการเลือกรูปภาพหรือไม่ (ฟังก์ชันใหม่)
+    if (fileInput.files.length === 0) {
+        return { valid: false, msg: 'กรุณาถ่ายรูปหรือเลือกรูปภาพจุดเกิดเหตุ' };
     }
+    
+    // 2. ตรวจสอบข้อมูลในฟอร์ม
+    if (!userlineIdInput.value || !nameIdInput.value || !keynumberIdInput.value || !keynumber3IdInput.value || !keynumber2IdInput.value) {
+        return { valid: false, msg: 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน' };
+    }
+    
+    // 3. ตรวจสอบพิกัดแผนที่
     if (!latitudeInput.value || !longitudeInput.value) {
         return { valid: false, msg: 'กรุณาระบุตำแหน่งในแผนที่' };
     }
+
     return { valid: true };
 }
 
@@ -558,7 +579,12 @@ submitBtn.addEventListener('click', async (event) => {
 
     const val = validateForm();
     if (!val.valid) {
-        Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบถ้วน', text: val.msg });
+        Swal.fire({ 
+            icon: 'warning', 
+            title: 'ข้อมูลไม่ครบถ้วน', 
+            text: val.msg,
+            confirmButtonText: 'ตกลง'
+        });
         return;
     }
 
@@ -581,12 +607,20 @@ submitBtn.addEventListener('click', async (event) => {
             let fileName = "NoImage";
             let fileType = "";
 
-            if (fileInput.files.length > 0) {
-                let file = fileInput.files[0];
-                base64 = await getBase64(file);
-                fileName = file.name;
-                fileType = file.type;
-            }
+            // เนื่องจากมีการบังคับใส่รูปภาพแล้ว จึงไม่ต้องตรวจสอบ fileInput.files.length > 0 ซ้ำอีก
+            let file = fileInput.files[0];
+            base64 = await getBase64(file);
+            fileName = file.name;
+            fileType = file.type;
+            
+            // ใช้รูปภาพเริ่มต้นเป็น placeholder กรณีที่ Web App ไม่ได้ส่ง URL กลับมา
+            // (แม้ว่าตอนนี้จะมีการบังคับใส่รูปแล้ว แต่ยังคง logic นี้ไว้เพื่อความเสถียร)
+            // if (fileInput.files.length > 0) {
+            //     let file = fileInput.files[0];
+            //     base64 = await getBase64(file);
+            //     fileName = file.name;
+            //     fileType = file.type;
+            // }
 
             let obj = {
                 userlineId: userlineIdInput.value,
