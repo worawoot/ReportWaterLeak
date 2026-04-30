@@ -67,14 +67,11 @@
             
             <!-- Image Upload -->
             <div class="mb-5 text-center">
-                <!-- ตั้งค่ารูปภาพพรีวิวเริ่มต้นให้เป็นรูปที่สื่อถึงการรออัปโหลด หรือเป็นรูปภาพที่ต้องใช้ -->
                 <div class="relative mx-auto w-full h-56 mb-4 group">
-                    <!-- ให้ src เป็นค่าว่างหรือรูป placeholder ที่ชัดเจน เพื่อไม่ให้ซ้ำกับรูป Default (DEFAULT_HERO_IMAGE) ใน JS ถ้ายังไม่มีการเลือกไฟล์ -->
-                    <!-- เนื่องจากมีการบังคับให้ใส่รูป จึงเปลี่ยนรูป preview เริ่มต้นเป็น placeholder ที่สื่อว่าต้องมีการอัปโหลด -->
                     <img src="https://drive.google.com/thumbnail?id=17Ejxsa6GFTFrpoKFkoXna-KudkgmPwHW" 
                          alt="Problem Image" 
                          id="preview" 
-                         class="w-full h-56 object-cover rounded-2xl border-4 border-white shadow-lg mx-auto bg-slate-50">                       
+                         class="w-full h-56 object-cover rounded-2xl border-4 border-white shadow-lg mx-auto bg-slate-50">                        
                     
                     <label for="file" class="absolute -bottom-2 -right-2 bg-white p-2.5 rounded-full shadow-md cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 border border-slate-200 active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -149,7 +146,7 @@
                         placeholder="จุดสังเกต หรือรายละเอียดความเสียหาย"></textarea>
                 </div>
 
-                <!-- Hidden e-Bill/e-Tax Checkboxes (Default Checked) -->
+                <!-- Hidden e-Bill/e-Tax Checkboxes -->
                 <div class="hidden">
                     <input type="checkbox" id="keynumber4Id" name="keynumber4Id" checked>
                     <input type="checkbox" id="keynumber5Id" name="keynumber5Id" checked>
@@ -163,20 +160,16 @@
             <footer class="text-center text-xs text-gray-400 mt-6 font-light">
                 MWA Reporting System © 2025
             </footer>
-        </div>           
+        </div>            
     </form>
 </div>
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
 // URL ของ Google Apps Script Web App
-//const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz9oiEei5V9ZYvcVPgzq_v1WWafS0YOclXh21MXlDZqsGQ0_WDrwxJq9YlEhvblZCr1RQ/exec'; 
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwYOgfbhqPZQzCLVxmqQkeUmG6e9r0ROQJfSBZVJ3CjTRLQJJcgGkjI3zoLiY4UFrLu/exec'; 
 // LIFF ID ของคุณ
 const LIFF_ID = '1657790891-40VQpd6O';
-const DEFAULT_AVATAR = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
-
-// รูป Default กรณีที่ไม่มีการอัปโหลดรูป (แต่ตอนนี้จะบังคับให้มีรูป)
 const DEFAULT_HERO_IMAGE = 'https://cdn.pixabay.com/photo/2014/06/04/16/36/manhole-cover-362150_960_720.jpg';
 
 let fileInput = document.getElementById("file");
@@ -195,7 +188,6 @@ let longitudeInput = document.getElementById("longitude");
 const loadingOverlay = document.getElementById('loadingOverlay');
 const loadingText = document.getElementById('loadingText');
 
-let currentProfileImage = DEFAULT_AVATAR;
 let map, marker;
 
 window.onload = function () {
@@ -205,13 +197,11 @@ window.onload = function () {
     initializeMap(); 
     initializeLiff();
     
-    // Auto call location on load (Silent Mode)
     getLocation(true); 
 };
 
 // --- MAP FUNCTIONS ---
 function initializeMap() {
-    // กำหนดพิกัดเริ่มต้นเป็นกรุงเทพฯ (หรือจุดเริ่มต้นที่คุณต้องการ)
     const defaultLat = 13.7563;
     const defaultLng = 100.5018;
 
@@ -221,16 +211,13 @@ function initializeMap() {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // สร้าง Marker ที่สามารถลากได้
     marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
 
-    // อัปเดตพิกัดเมื่อลาก Marker เสร็จ
     marker.on('dragend', function(e) {
         const position = marker.getLatLng();
         updateLocationInputs(position.lat, position.lng);
     });
 
-    // อัปเดตพิกัดเมื่อคลิกบนแผนที่
     map.on('click', function(e) {
         marker.setLatLng(e.latlng);
         updateLocationInputs(e.latlng.lat, e.latlng.lng);
@@ -251,38 +238,24 @@ function getLocation(isAuto = false) {
         navigator.geolocation.getCurrentPosition(
             (position) => showPosition(position, isAuto), 
             (error) => showError(error, isAuto), 
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
     } else {
-        if (!isAuto) {
-            Swal.close();
-            Swal.fire('Error', 'เบราว์เซอร์ไม่รองรับ Geolocation', 'error');
-        }
+        if (!isAuto) Swal.fire('Error', 'เบราว์เซอร์ไม่รองรับ Geolocation', 'error');
     }
 }
 
 function showPosition(position, isAuto) {
     if (!isAuto) Swal.close();
-    
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
 
-    // ตั้งค่ามุมมองแผนที่และตำแหน่ง Marker
     map.setView([lat, lng], 17);
     marker.setLatLng([lat, lng]);
     updateLocationInputs(lat, lng);
 
     if (!isAuto) {
-        Swal.fire({
-            icon: 'success',
-            title: 'ระบุตำแหน่งสำเร็จ',
-            timer: 1500,
-            showConfirmButton: false
-        });
+        Swal.fire({ icon: 'success', title: 'ระบุตำแหน่งสำเร็จ', timer: 1500, showConfirmButton: false });
     }
 }
 
@@ -293,14 +266,13 @@ function updateLocationInputs(lat, lng) {
 
 function showError(error, isAuto) {
     if (isAuto) return; 
-
     Swal.close();
     let msg = "ไม่สามารถระบุตำแหน่งได้";
     if (error.code === error.PERMISSION_DENIED) msg = "กรุณากด 'อนุญาต' ให้เข้าถึงตำแหน่ง";
     Swal.fire('ข้อผิดพลาด', msg, 'warning');
 }
-// ---------------------
 
+// --- LIFF FUNCTIONS ---
 async function initializeLiff() {
     try {
         await liff.init({ liffId: LIFF_ID });
@@ -327,8 +299,7 @@ async function getUserProfile() {
     }
 }
 
-// --- UPDATED FLEX MESSAGE FUNCTION ---
-// รับ Parameter uploadedImageUrl มาแสดงผล
+// --- FLEX MESSAGE ---
 async function sendFlexMessage(uploadedImageUrl) {
     if (!liff.isInClient()) return;
 
@@ -338,7 +309,6 @@ async function sendFlexMessage(uploadedImageUrl) {
     let mapLink = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
     let currentDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit'});
 
-    // เลือกใช้รูปที่อัปโหลด (เนื่องจากมีการบังคับใส่รูป)
     let displayImage = uploadedImageUrl && uploadedImageUrl !== "" ? uploadedImageUrl : DEFAULT_HERO_IMAGE;
 
     const flexMessage = {
@@ -349,7 +319,7 @@ async function sendFlexMessage(uploadedImageUrl) {
             "size": "mega",
             "hero": {
                 "type": "image",
-                "url": displayImage, // *** ใช้ตัวแปรนี้แทน ***
+                "url": displayImage,
                 "size": "full",
                 "aspectRatio": "20:13",
                 "aspectMode": "cover"                
@@ -358,175 +328,60 @@ async function sendFlexMessage(uploadedImageUrl) {
                 "type": "box",
                 "layout": "vertical",
                 "contents": [
+                    { "type": "text", "text": "รับแจ้งเหตุเรียบร้อย", "weight": "bold", "size": "xl", "color": "#0056b3" },
+                    { "type": "text", "text": `วันที่: ${currentDate}`, "size": "xs", "color": "#aaaaaa", "margin": "sm" },
+                    { "type": "separator", "margin": "lg" },
                     {
-                        "type": "text",
-                        "text": "รับแจ้งเหตุเรียบร้อย",
-                        "weight": "bold",
-                        "size": "xl",
-                        "color": "#0056b3"
-                    },
-                    {
-                        "type": "text",
-                        "text": `วันที่: ${currentDate}`,
-                        "size": "xs",
-                        "color": "#aaaaaa",
-                        "margin": "sm"
-                    },
-                    {
-                        "type": "separator",
-                        "margin": "lg"
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "margin": "lg",
-                        "spacing": "sm",
+                        "type": "box", "layout": "vertical", "margin": "lg", "spacing": "sm",
                         "contents": [
                             {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
+                                "type": "box", "layout": "baseline", "spacing": "sm",
                                 "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "หัวข้อ",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": keynumber3IdInput.value,
-                                        "wrap": true,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 5,
-                                        "weight": "bold"
-                                    }
+                                    { "type": "text", "text": "หัวข้อ", "color": "#aaaaaa", "size": "sm", "flex": 2 },
+                                    { "type": "text", "text": keynumber3IdInput.value, "wrap": true, "color": "#666666", "size": "sm", "flex": 5, "weight": "bold" }
                                 ]
                             },
                             {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
+                                "type": "box", "layout": "baseline", "spacing": "sm",
                                 "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "ผู้แจ้ง",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": nameIdInput.value,
-                                        "wrap": true,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 5
-                                    }
+                                    { "type": "text", "text": "ผู้แจ้ง", "color": "#aaaaaa", "size": "sm", "flex": 2 },
+                                    { "type": "text", "text": nameIdInput.value, "wrap": true, "color": "#666666", "size": "sm", "flex": 5 }
                                 ]
                             },
                             {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
+                                "type": "box", "layout": "baseline", "spacing": "sm",
                                 "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "เบอร์โทร",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": formattedPhone,
-                                        "wrap": true,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 5
-                                    }
+                                    { "type": "text", "text": "เบอร์โทร", "color": "#aaaaaa", "size": "sm", "flex": 2 },
+                                    { "type": "text", "text": formattedPhone, "wrap": true, "color": "#666666", "size": "sm", "flex": 5 }
                                 ]
                             },
                             {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
+                                "type": "box", "layout": "baseline", "spacing": "sm",
                                 "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "พิกัด",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": `${lat}, ${long}`,
-                                        "wrap": true,
-                                        "color": "#666666",
-                                        "size": "xs",
-                                        "flex": 5
-                                    }
+                                    { "type": "text", "text": "พิกัด", "color": "#aaaaaa", "size": "sm", "flex": 2 },
+                                    { "type": "text", "text": `${lat}, ${long}`, "wrap": true, "color": "#666666", "size": "xs", "flex": 5 }
                                 ]
                             }
                         ]
                     },
                     {
-                        "type": "box",
-                        "layout": "vertical",
-                        "margin": "lg",
+                        "type": "box", "layout": "vertical", "margin": "lg",
                         "contents": [
-                            {
-                                "type": "text",
-                                "text": "รายละเอียดเพิ่มเติม:",
-                                "size": "xs",
-                                "color": "#aaaaaa",
-                                "margin": "none"
-                            },
-                            {
-                                "type": "text",
-                                "text": keynumber2IdInput.value,
-                                "wrap": true,
-                                "color": "#333333",
-                                "size": "sm",
-                                "margin": "sm"
-                            }
+                            { "type": "text", "text": "รายละเอียดเพิ่มเติม:", "size": "xs", "color": "#aaaaaa", "margin": "none" },
+                            { "type": "text", "text": keynumber2IdInput.value, "wrap": true, "color": "#333333", "size": "sm", "margin": "sm" }
                         ]
                     }
                 ]
             },
             "footer": {
-                "type": "box",
-                "layout": "vertical",
-                "spacing": "sm",
+                "type": "box", "layout": "vertical", "spacing": "sm",
                 "contents": [
                     {
-                        "type": "button",
-                        "style": "primary",
-                        "height": "sm",
-                        "action": {
-                            "type": "uri",
-                            "label": "ดูตำแหน่งใน Google Map",
-                            "uri": mapLink
-                        },
-                        "color": "#0056b3"
+                        "type": "button", "style": "primary", "height": "sm", "color": "#0056b3",
+                        "action": { "type": "uri", "label": "ดูตำแหน่งใน Google Map", "uri": mapLink }
                     },
-                    {
-                        "type": "text",
-                        "text": "ข้อมูลของท่านถูกบันทึกเรียบร้อยแล้ว",
-                        "align": "center",
-                        "size": "sm",
-                        "color": "#aaaaaa",
-                        "margin": "lg"
-                    },
-                    {
-                        "type": "spacer",
-                        "size": "sm"
-                    }
-                ],
-                "flex": 0
+                    { "type": "text", "text": "ข้อมูลของท่านถูกบันทึกเรียบร้อยแล้ว", "align": "center", "size": "sm", "color": "#aaaaaa", "margin": "lg" }
+                ]
             }
         }
     };
@@ -536,6 +391,7 @@ async function sendFlexMessage(uploadedImageUrl) {
     } catch (error) { console.error("LIFF Send Error:", error); }
 }
 
+// --- UTILS & SUBMIT ---
 function getBase64(file) {
     return new Promise((resolve, reject) => {
         let reader = new FileReader();
@@ -545,33 +401,21 @@ function getBase64(file) {
     });
 }
 
-// จัดการการแสดงรูปภาพพรีวิวเมื่อมีการเลือกไฟล์
 fileInput.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
         let file = fileInput.files[0];
         let reader = new FileReader();
-        // เปลี่ยนรูป placeholder เป็นรูปที่เลือก
         reader.onload = function(e) { imgPreview.src = e.target.result; };
         reader.readAsDataURL(file);
     }
 });
 
 function validateForm() {
-    // 1. ตรวจสอบว่ามีการเลือกรูปภาพหรือไม่ (ฟังก์ชันใหม่)
-    if (fileInput.files.length === 0) {
-        return { valid: false, msg: 'กรุณาถ่ายรูปหรือเลือกรูปภาพจุดเกิดเหตุ' };
-    }
-    
-    // 2. ตรวจสอบข้อมูลในฟอร์ม
-    if (!userlineIdInput.value || !nameIdInput.value || !keynumberIdInput.value || !keynumber3IdInput.value || !keynumber2IdInput.value) {
+    if (fileInput.files.length === 0) return { valid: false, msg: 'กรุณาถ่ายรูปหรือเลือกรูปภาพจุดเกิดเหตุ' };
+    if (!nameIdInput.value || !keynumberIdInput.value || !keynumber3IdInput.value || !keynumber2IdInput.value) {
         return { valid: false, msg: 'กรุณากรอกข้อมูลที่มีเครื่องหมาย * ให้ครบถ้วน' };
     }
-    
-    // 3. ตรวจสอบพิกัดแผนที่
-    if (!latitudeInput.value || !longitudeInput.value) {
-        return { valid: false, msg: 'กรุณาระบุตำแหน่งในแผนที่' };
-    }
-
+    if (!latitudeInput.value || !longitudeInput.value) return { valid: false, msg: 'กรุณาระบุตำแหน่งในแผนที่' };
     return { valid: true };
 }
 
@@ -580,22 +424,13 @@ submitBtn.addEventListener('click', async (event) => {
 
     const val = validateForm();
     if (!val.valid) {
-        Swal.fire({ 
-            icon: 'warning', 
-            title: 'ข้อมูลไม่ครบถ้วน', 
-            text: val.msg,
-            confirmButtonText: 'ตกลง'
-        });
+        Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบถ้วน', text: val.msg, confirmButtonText: 'ตกลง' });
         return;
     }
 
     const isConfirmed = await Swal.fire({
-        title: 'ยืนยันการแจ้งเหตุ',
-        text: 'ตรวจสอบข้อมูลถูกต้องแล้วใช่หรือไม่?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'ยืนยัน',
-        cancelButtonText: 'แก้ไข'
+        title: 'ยืนยันการแจ้งเหตุ', text: 'ตรวจสอบข้อมูลถูกต้องแล้วใช่หรือไม่?', icon: 'question',
+        showCancelButton: true, confirmButtonText: 'ยืนยัน', cancelButtonText: 'แก้ไข'
     });
 
     if (isConfirmed.isConfirmed) {
@@ -604,27 +439,11 @@ submitBtn.addEventListener('click', async (event) => {
         loadingOverlay.style.display = 'flex';       
 
         try {
-            let base64 = "";
-            let fileName = "NoImage";
-            let fileType = "";
-
-            // เนื่องจากมีการบังคับใส่รูปภาพแล้ว จึงไม่ต้องตรวจสอบ fileInput.files.length > 0 ซ้ำอีก
             let file = fileInput.files[0];
-            base64 = await getBase64(file);
-            fileName = file.name;
-            fileType = file.type;
+            let base64 = await getBase64(file);
             
-            // ใช้รูปภาพเริ่มต้นเป็น placeholder กรณีที่ Web App ไม่ได้ส่ง URL กลับมา
-            // (แม้ว่าตอนนี้จะมีการบังคับใส่รูปแล้ว แต่ยังคง logic นี้ไว้เพื่อความเสถียร)
-            // if (fileInput.files.length > 0) {
-            //     let file = fileInput.files[0];
-            //     base64 = await getBase64(file);
-            //     fileName = file.name;
-            //     fileType = file.type;
-            // }
-
             let obj = {
-                userlineId: userlineIdInput.value,
+                userlineId: userlineIdInput.value || "no-line-id",
                 nameId: nameIdInput.value,
                 keynumberId: keynumberIdInput.value,
                 keynumber2Id: keynumber2IdInput.value,
@@ -634,33 +453,44 @@ submitBtn.addEventListener('click', async (event) => {
                 latitude: latitudeInput.value,
                 longitude: longitudeInput.value,
                 base64: base64,
-                name: fileName,
-                type: fileType
+                name: file.name,
+                type: file.type
             };
 
-            // Call Web App
+            // [การแก้ไขสำคัญ] เพิ่ม Headers และ Redirect เพื่อให้ส่งหา GAS ได้โดยไม่ติด CORS
             const response = await fetch(WEB_APP_URL, {
                 method: "POST",
-                body: JSON.stringify(obj)
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8",
+                },
+                body: JSON.stringify(obj),
+                redirect: "follow"
             });
 
-            // *** รับค่า JSON กลับมาจาก Google Apps Script ***
-            const data = await response.json(); 
+            // [การแก้ไขสำคัญ] ดักจับกรณีที่เซิร์ฟเวอร์ตอบกลับเป็น HTML (เช่น Error หรือติดสิทธิ์)
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch(e) {
+                console.error("Server Error Response:", responseText);
+                throw new Error("สคริปต์ปลายทาง (GAS) ทำงานผิดพลาด หรือ ไม่ได้ตั้งค่าสิทธิ์ให้เข้าถึงได้");
+            }
             
-            // ดึง URL จาก Response ถ้าไม่มีก็ส่งค่าว่างไป
             let uploadedImageUrl = data.imageUrl || "";
-
-            // ส่ง URL รูปไปให้ฟังก์ชันสร้าง Flex Message
             await sendFlexMessage(uploadedImageUrl);
             
             loadingOverlay.style.display = 'none';
             await Swal.fire('สำเร็จ', 'ส่งข้อมูลเรียบร้อยแล้ว', 'success');
-            liff.closeWindow();
+            
+            if (liff.isInClient()) {
+                liff.closeWindow();
+            }
 
         } catch (error) {
             loadingOverlay.style.display = 'none';
-            console.error(error);
-            Swal.fire('Error', 'เกิดข้อผิดพลาดในการส่งข้อมูล', 'error');
+            console.error("Submit Error:", error);
+            Swal.fire('Error', error.message || 'เกิดข้อผิดพลาดในการส่งข้อมูล', 'error');
             submitBtn.disabled = false;
         } 
     }
