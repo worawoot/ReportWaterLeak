@@ -301,8 +301,7 @@ async function getUserProfile() {
 }
 
 // --- FLEX MESSAGE ---
-// [เพิ่มรับค่า keyId เข้ามาในฟังก์ชัน]
-async function sendFlexMessage(uploadedImageUrl, keyId) {
+async function sendFlexMessage(uploadedImageUrl) {
     if (!liff.isInClient()) return;
 
     let formattedPhone = keynumberIdInput.value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
@@ -336,14 +335,6 @@ async function sendFlexMessage(uploadedImageUrl, keyId) {
                     {
                         "type": "box", "layout": "vertical", "margin": "lg", "spacing": "sm",
                         "contents": [
-                            // [เพิ่มการแสดงผล เลขที่คำร้อง]
-                            {
-                                "type": "box", "layout": "baseline", "spacing": "sm",
-                                "contents": [
-                                    { "type": "text", "text": "เลขที่คำร้อง", "color": "#aaaaaa", "size": "sm", "flex": 2 },
-                                    { "type": "text", "text": String(keyId), "wrap": true, "color": "#0056b3", "size": "sm", "flex": 5, "weight": "bold" }
-                                ]
-                            },
                             {
                                 "type": "box", "layout": "baseline", "spacing": "sm",
                                 "contents": [
@@ -467,6 +458,7 @@ submitBtn.addEventListener('click', async (event) => {
                 type: file.type
             };
 
+            // [การแก้ไขสำคัญ] เพิ่ม Headers และ Redirect เพื่อให้ส่งหา GAS ได้โดยไม่ติด CORS
             const response = await fetch(WEB_APP_URL, {
                 method: "POST",
                 headers: {
@@ -476,6 +468,7 @@ submitBtn.addEventListener('click', async (event) => {
                 redirect: "follow"
             });
 
+            // [การแก้ไขสำคัญ] ดักจับกรณีที่เซิร์ฟเวอร์ตอบกลับเป็น HTML (เช่น Error หรือติดสิทธิ์)
             const responseText = await response.text();
             let data;
             try {
@@ -486,15 +479,10 @@ submitBtn.addEventListener('click', async (event) => {
             }
             
             let uploadedImageUrl = data.imageUrl || "";
-            // [ดึงค่า keyId ที่ได้จาก Backend มาเก็บไว้]
-            let returnedKeyId = data.keyId || "ไม่ระบุ"; 
-            
-            // [ส่งค่า keyId ไปยังฟังก์ชัน sendFlexMessage]
-            await sendFlexMessage(uploadedImageUrl, returnedKeyId);
+            await sendFlexMessage(uploadedImageUrl);
             
             loadingOverlay.style.display = 'none';
-            // [เพิ่มเลขที่คำร้องไปใน Popup แจ้งเตือนด้วย]
-            await Swal.fire('สำเร็จ', `ส่งข้อมูลเรียบร้อยแล้ว<br>เลขที่คำร้องของคุณคือ: <b>${returnedKeyId}</b>`, 'success');
+            await Swal.fire('สำเร็จ', 'ส่งข้อมูลเรียบร้อยแล้ว', 'success');
             
             if (liff.isInClient()) {
                 liff.closeWindow();
