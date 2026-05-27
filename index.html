@@ -167,6 +167,7 @@
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
 // URL ของ Google Apps Script Web App
+//const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwYOgfbhqPZQzCLVxmqQkeUmG6e9r0ROQJfSBZVJ3CjTRLQJJcgGkjI3zoLiY4UFrLu/exec';
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyx7DpGQ5DxEFa4VZjJrFWuVRDxGCZe09QSrMNFYfsK_HL9t_-knPTmPGCXndqgyT18CA/exec';    
 // LIFF ID ของคุณ
 const LIFF_ID = '1657790891-40VQpd6O';
@@ -300,8 +301,7 @@ async function getUserProfile() {
 }
 
 // --- FLEX MESSAGE ---
-// เพิ่มรับค่า requestId เพื่อนำมาแสดงผล
-async function sendFlexMessage(uploadedImageUrl, requestId) {
+async function sendFlexMessage(uploadedImageUrl) {
     if (!liff.isInClient()) return;
 
     let formattedPhone = keynumberIdInput.value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
@@ -338,15 +338,8 @@ async function sendFlexMessage(uploadedImageUrl, requestId) {
                             {
                                 "type": "box", "layout": "baseline", "spacing": "sm",
                                 "contents": [
-                                    { "type": "text", "text": "เลขที่คำร้อง", "color": "#aaaaaa", "size": "sm", "flex": 2 },
-                                    { "type": "text", "text": requestId, "wrap": true, "color": "#0056b3", "size": "sm", "flex": 5, "weight": "bold" }
-                                ]
-                            },
-                            {
-                                "type": "box", "layout": "baseline", "spacing": "sm",
-                                "contents": [
                                     { "type": "text", "text": "หัวข้อ", "color": "#aaaaaa", "size": "sm", "flex": 2 },
-                                    { "type": "text", "text": keynumber3IdInput.value, "wrap": true, "color": "#666666", "size": "sm", "flex": 5 }
+                                    { "type": "text", "text": keynumber3IdInput.value, "wrap": true, "color": "#666666", "size": "sm", "flex": 5, "weight": "bold" }
                                 ]
                             },
                             {
@@ -465,6 +458,7 @@ submitBtn.addEventListener('click', async (event) => {
                 type: file.type
             };
 
+            // [การแก้ไขสำคัญ] เพิ่ม Headers และ Redirect เพื่อให้ส่งหา GAS ได้โดยไม่ติด CORS
             const response = await fetch(WEB_APP_URL, {
                 method: "POST",
                 headers: {
@@ -474,6 +468,7 @@ submitBtn.addEventListener('click', async (event) => {
                 redirect: "follow"
             });
 
+            // [การแก้ไขสำคัญ] ดักจับกรณีที่เซิร์ฟเวอร์ตอบกลับเป็น HTML (เช่น Error หรือติดสิทธิ์)
             const responseText = await response.text();
             let data;
             try {
@@ -484,14 +479,10 @@ submitBtn.addEventListener('click', async (event) => {
             }
             
             let uploadedImageUrl = data.imageUrl || "";
-            // รับค่า requestId จากฝั่ง Backend
-            let requestId = data.requestId || "อยู่ระหว่างดำเนินการ";
-            
-            // ส่ง parameter requestId ไปให้ฟังก์ชัน Flex Message
-            await sendFlexMessage(uploadedImageUrl, requestId);
+            await sendFlexMessage(uploadedImageUrl);
             
             loadingOverlay.style.display = 'none';
-            await Swal.fire('สำเร็จ', 'ส่งข้อมูลเรียบร้อยแล้ว\nเลขที่คำร้อง: ' + requestId, 'success');
+            await Swal.fire('สำเร็จ', 'ส่งข้อมูลเรียบร้อยแล้ว', 'success');
             
             if (liff.isInClient()) {
                 liff.closeWindow();
